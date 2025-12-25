@@ -2,7 +2,7 @@
 
 Sistem pelaporan kerusakan jalan berbasis web untuk Kota Surabaya yang memungkinkan warga melaporkan kerusakan jalan secara online dengan mudah dan cepat.
 
-## 📋 Daftar Isi
+## Daftar Isi
 
 - [Fitur Utama](#fitur-utama)
 - [Teknologi yang Digunakan](#teknologi-yang-digunakan)
@@ -28,21 +28,21 @@ Sistem pelaporan kerusakan jalan berbasis web untuk Kota Surabaya yang memungkin
 - **Logout** dengan konfirmasi
 
 ### 👥 Fitur untuk Pengguna (User)
-- ✅ Membuat laporan kerusakan jalan baru
-- 📸 Upload foto sebagai bukti visual
-- 📋 Melihat daftar laporan yang telah dibuat
-- ✏️ Edit laporan yang sudah dikirim
-- 🗑️ Hapus laporan
-- 📊 Tracking status laporan (Dikirim/Diproses/Selesai)
-- 📈 Dashboard dengan statistik personal
+-  Membuat laporan kerusakan jalan baru
+-  Upload foto sebagai bukti visual
+-  Melihat daftar laporan yang telah dibuat
+-  Edit laporan yang sudah dikirim
+-  Hapus laporan
+-  Tracking status laporan (Dikirim/Diproses/Selesai)
+-  Dashboard dengan statistik personal
 
 ### 👨‍💼 Fitur untuk Administrator
-- 🎛️ Dashboard admin dengan statistik lengkap
-- 👀 Akses ke semua laporan dari seluruh user
-- ✏️ Edit laporan dari user manapun
-- 🔄 Update status laporan (Dikirim → Diproses → Selesai)
-- 🗑️ Hapus laporan
-- 📊 Statistik dan visualisasi data
+-  Dashboard admin dengan statistik lengkap
+-  Akses ke semua laporan dari seluruh user
+-  Edit laporan dari user manapun
+-  Update status laporan (Dikirim → Diproses → Selesai)
+-  Hapus laporan
+-  Statistik dan visualisasi data
 
 ### 🎨 Antarmuka Pengguna
 - **Design Modern** dengan skema warna custom
@@ -559,5 +559,6 @@ Untuk pertanyaan, bug report, atau feature request:
 ---
 
 **Dibuat dengan ❤️ untuk Kota Surabaya**
+
 
 *Terakhir diupdate: Desember 2024*
