@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profil - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Pengguna</div>
+                        <div class="user-role">Pengguna</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-user.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="laporan-baru.html"><i class="fas fa-plus-circle"></i> Buat Laporan</a></li>
+                        <li><a href="daftar-laporan.html"><i class="fas fa-list"></i> Laporan Saya</a></li>
+                        <li><a href="edit-profil.html" class="active"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+                </div>
+                
+                <div class="dashboard-content">
+                    <h1 class="dashboard-title">Edit Profil</h1>
+                    <p>Perbarui informasi profil Anda</p>
+                    
+                    <form id="editProfilForm">
+                        <div class="form-group">
+                            <label for="nama_lengkap" class="form-label">Nama Lengkap *</label>
+                            <input type="text" id="nama_lengkap" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="alamat" class="form-label">Alamat</label>
+                            <textarea id="alamat" class="form-control" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="no_telepon" class="form-label">No. Telepon</label>
+                            <input type="text" id="no_telepon" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password Baru</label>
+                            <input type="password" id="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <div class="form-text">Minimal 6 karakter</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Konfirmasi Password Baru</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Konfirmasi password baru">
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

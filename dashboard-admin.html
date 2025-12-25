@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Administrator</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                    <a href="index.html" class="btn btn-outline" style="margin-left: 10px;">Beranda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu Admin</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="daftar-laporan-admin.html"><i class="fas fa-list"></i> Semua Laporan</a></li>
+                        <li><a href="kelola-pengguna.html"><i class="fas fa-users-cog"></i> Kelola Pengguna</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+                    
+                    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h4>Statistik Cepat</h4>
+                        <div id="quickStats" style="margin-top: 10px;">
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Total Laporan: <span id="quick-total">0</span></p>
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Dalam Proses: <span id="quick-diproses">0</span></p>
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Pengguna: <span id="quick-users">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-content">
+                    <h1 class="dashboard-title">Dashboard Administrator</h1>
+                    <p class="greeting">Halo, Administrator</p>
+                    
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-road-circle-exclamation"></i>
+                            </div>
+                            <div class="stat-number" id="admin-total-laporan">0</div>
+                            <div class="stat-label">Total Laporan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="stat-number" id="admin-laporan-diproses">0</div>
+                            <div class="stat-label">Dalam Proses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-road-circle-check"></i>
+                            </div>
+                            <div class="stat-number" id="admin-laporan-selesai">0</div>
+                            <div class="stat-label">Selesai</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-number" id="admin-total-users">0</div>
+                            <div class="stat-label">Pengguna Terdaftar</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chart Container -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 15px;">Laporan per Status</h3>
+                            <canvas id="statusChart" height="200"></canvas>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 15px;">Laporan per Kecamatan (Top 5)</h3>
+                            <canvas id="kecamatanChart" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <h2 style="margin-bottom: 20px;">Laporan Terbaru</h2>
+                    <div class="table-responsive">
+                        <table class="table" id="recentLaporanTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Judul</th>
+                                    <th>Pelapor</th>
+                                    <th>Lokasi</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 20px;">Memuat data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <a href="daftar-laporan-admin.html" class="btn btn-primary">Lihat Semua Laporan</a>
+                            <a href="kelola-pengguna.html" class="btn btn-secondary" style="margin-left: 10px;">Kelola Pengguna</a>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline" id="refreshBtn">
+                                <i class="fas fa-sync-alt"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h3><i class="fas fa-bolt"></i> Aksi Cepat</h3>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-outline" onclick="window.location.href='daftar-laporan-admin.html?status=diproses'">
+                                <i class="fas fa-tasks"></i> Lihat Laporan Diproses
+                            </button>
+                            <button class="btn btn-outline" onclick="window.location.href='daftar-laporan-admin.html?status=dikirim'">
+                                <i class="fas fa-clock"></i> Lihat Laporan Baru
+                            </button>
+                            <button class="btn btn-outline" onclick="exportReportData()">
+                                <i class="fas fa-download"></i> Export Laporan
+                            </button>
+                            <button class="btn btn-outline" onclick="showSystemInfo()">
+                                <i class="fas fa-info-circle"></i> Info Sistem
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Chart instances
+        let statusChart = null;
+        let kecamatanChart = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdminDashboardData();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Refresh button
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+                    loadAdminDashboardData();
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                    }, 1000);
+                });
+            }
+            
+            // Quick action buttons
+            document.querySelectorAll('.btn-outline').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.add('btn-loading');
+                    setTimeout(() => {
+                        this.classList.remove('btn-loading');
+                    }, 500);
+                });
+            });
+        }
+        
+        async function loadAdminDashboardData() {
+            try {
+                // Load stats
+                await loadAdminStats();
+                
+                // Load recent laporan
+                await loadRecentLaporan();
+                
+                // Load charts
+                await loadChartsData();
+                
+                // Update quick stats
+                updateQuickStats();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showAlert('error', 'Gagal memuat data dashboard');
+            }
+        }
+        
+        async function loadAdminStats() {
+            try {
+                const response = await fetch('api.php?action=get_stats');
+                const data = await response.json();
+                
+                if (data.success && data.data.stats) {
+                    const stats = data.data.stats;
+                    
+                    // Update main stats
+                    document.getElementById('admin-total-laporan').textContent = stats.total_laporan || 0;
+                    document.getElementById('admin-laporan-diproses').textContent = stats.status_stats?.diproses || 0;
+                    document.getElementById('admin-laporan-selesai').textContent = stats.status_stats?.selesai || 0;
+                    document.getElementById('admin-total-users').textContent = stats.total_users || 0;
+                    
+                    // Animate counters
+                    animateCounters();
+                }
+            } catch (error) {
+                console.error('Error loading admin stats:', error);
+            }
+        }
+        
+        async function loadRecentLaporan() {
+            try {
+                const response = await fetch('api.php?action=get_laporan');
+                const data = await response.json();
+                
+                if (data.success && data.data.laporan) {
+                    // Get only first 5 laporan for dashboard
+                    const recentLaporan = data.data.laporan.slice(0, 5);
+                    displayRecentLaporan(recentLaporan);
+                }
+            } catch (error) {
+                console.error('Error loading recent laporan:', error);
+            }
+        }
+        
+        function displayRecentLaporan(laporanList) {
+            const tbody = document.querySelector('#recentLaporanTable tbody');
+            if (!tbody) return;
+            
+            if (laporanList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #6c757d;">
+                            Belum ada laporan
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            laporanList.forEach(laporan => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${laporan.id}</td>
+                    <td><strong>${laporan.judul_laporan}</strong></td>
+                    <td>
+                        <div>${laporan.nama_lengkap || laporan.username}</div>
+                        <small style="color: #6c757d; font-size: 0.8rem;">${laporan.email || ''}</small>
+                    </td>
+                    <td>${laporan.lokasi_jalan}</td>
+                    <td>${formatDate(laporan.tanggal_laporan_formatted)}</td>
+                    <td><span class="status-badge status-${laporan.status}">${laporan.status}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <a href="edit-laporan.html?id=${laporan.id}" class="btn btn-outline btn-small">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="detail-laporan.html?id=${laporan.id}" class="btn btn-info btn-small" target="_blank">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        async function loadChartsData() {
+            try {
+                // Load data for charts
+                const response = await fetch('api.php?action=get_laporan');
+                const data = await response.json();
+                
+                if (data.success && data.data.laporan) {
+                    const laporanList = data.data.laporan;
+                    createStatusChart(laporanList);
+                    createKecamatanChart(laporanList);
+                }
+            } catch (error) {
+                console.error('Error loading charts data:', error);
+            }
+        }
+        
+        function createStatusChart(laporanList) {
+            const ctx = document.getElementById('statusChart');
+            if (!ctx) return;
+            
+            // Count by status
+            const statusCounts = {
+                dikirim: 0,
+                diproses: 0,
+                selesai: 0
+            };
+            
+            laporanList.forEach(laporan => {
+                if (statusCounts[laporan.status] !== undefined) {
+                    statusCounts[laporan.status]++;
+                }
+            });
+            
+            // Destroy previous chart if exists
+            if (statusChart) {
+                statusChart.destroy();
+            }
+            
+            statusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Dikirim', 'Diproses', 'Selesai'],
+                    datasets: [{
+                        data: [statusCounts.dikirim, statusCounts.diproses, statusCounts.selesai],
+                        backgroundColor: [
+                            '#FFC107', // Kuning untuk dikirim
+                            '#4A8BDF', // Biru untuk diproses
+                            '#00DD00'  // Hijau untuk selesai
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createKecamatanChart(laporanList) {
+            const ctx = document.getElementById('kecamatanChart');
+            if (!ctx) return;
+            
+            // Count by kecamatan
+            const kecamatanCounts = {};
+            laporanList.forEach(laporan => {
+                const kecamatan = laporan.kecamatan;
+                kecamatanCounts[kecamatan] = (kecamatanCounts[kecamatan] || 0) + 1;
+            });
+            
+            // Sort and get top 5
+            const sortedKecamatans = Object.entries(kecamatanCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            const labels = sortedKecamatans.map(item => item[0]);
+            const data = sortedKecamatans.map(item => item[1]);
+            
+            // Destroy previous chart if exists
+            if (kecamatanChart) {
+                kecamatanChart.destroy();
+            }
+            
+            kecamatanChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah Laporan',
+                        data: data,
+                        backgroundColor: '#4A8BDF',
+                        borderColor: '#3A7BC8',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateQuickStats() {
+            const totalLaporan = document.getElementById('admin-total-laporan').textContent;
+            const diproses = document.getElementById('admin-laporan-diproses').textContent;
+            const totalUsers = document.getElementById('admin-total-users').textContent;
+            
+            document.getElementById('quick-total').textContent = totalLaporan;
+            document.getElementById('quick-diproses').textContent = diproses;
+            document.getElementById('quick-users').textContent = totalUsers;
+        }
+        
+        function exportReportData() {
+            try {
+                fetch('api.php?action=get_laporan')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.data.laporan) {
+                            const laporanList = data.data.laporan;
+                            
+                            // Format data for CSV
+                            const headers = ['ID', 'Judul', 'Pelapor', 'Email', 'Lokasi', 'Kecamatan', 'Status', 'Kerusakan', 'Tanggal', 'Deskripsi'];
+                            const csvData = laporanList.map(laporan => [
+                                laporan.id,
+                                `"${laporan.judul_laporan}"`,
+                                `"${laporan.nama_lengkap}"`,
+                                `"${laporan.email || ''}"`,
+                                `"${laporan.lokasi_jalan}"`,
+                                `"${laporan.kecamatan}"`,
+                                laporan.status,
+                                laporan.tingkat_kerusakan,
+                                laporan.tanggal_laporan_formatted,
+                                `"${laporan.deskripsi_kerusakan.replace(/"/g, '""')}"`
+                            ]);
+                            
+                            // Create CSV content
+                            const csvContent = [
+                                headers.join(','),
+                                ...csvData.map(row => row.join(','))
+                            ].join('\n');
+                            
+                            // Create and download file
+                            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.setAttribute('href', url);
+                            link.setAttribute('download', `laporan_jalan_${new Date().toISOString().split('T')[0]}.csv`);
+                            link.style.visibility = 'hidden';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            
+                            showAlert('success', 'Data berhasil diexport');
+                        }
+                    });
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showAlert('error', 'Gagal mengexport data');
+            }
+        }
+        
+        function showSystemInfo() {
+            const infoHtml = `
+                <div style="padding: 20px;">
+                    <h3>Informasi Sistem</h3>
+                    <table style="width: 100%; margin-top: 15px;">
+                        <tr>
+                            <td style="padding: 8px 0; width: 40%;"><strong>Versi Aplikasi:</strong></td>
+                            <td>1.0.0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>Total Laporan:</strong></td>
+                            <td id="sys-total-laporan">0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>Total Pengguna:</strong></td>
+                            <td id="sys-total-users">0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>Tanggal Hari Ini:</strong></td>
+                            <td>${new Date().toLocaleDateString('id-ID')}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>Browser:</strong></td>
+                            <td>${navigator.userAgent.split(') ')[0].split('(')[1]}</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="btn btn-primary" onclick="this.parentElement.parentElement.parentElement.remove()">Tutup</button>
+                    </div>
+                </div>
+            `;
+            
+            showModal('Informasi Sistem', infoHtml);
+            
+            // Update system info
+            document.getElementById('sys-total-laporan').textContent = 
+                document.getElementById('admin-total-laporan').textContent;
+            document.getElementById('sys-total-users').textContent = 
+                document.getElementById('admin-total-users').textContent;
+        }
+        
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = +counter.textContent;
+                const increment = target / 50;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, 30);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                return dateString;
+            }
+        }
+        
+        // Helper function untuk show modal
+        function showModal(title, content) {
+            // Remove existing modal
+            const existingModal = document.querySelector('.modal-overlay');
+            if (existingModal) existingModal.remove();
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div style="padding: 20px; border-bottom: 1px solid #e9ecef;">
+                        <h3 style="margin: 0;">${title}</h3>
+                    </div>
+                    <div>${content}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

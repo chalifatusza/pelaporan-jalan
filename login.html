@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="nav-buttons">
+                    <a href="index.html" class="btn btn-outline">Kembali ke Beranda</a>
+                </div>
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="form-container">
+                <h1 class="form-title">Masuk ke Akun Anda</h1>
+                <p class="text-center" style="margin-bottom: 30px;">Belum punya akun? <a href="register.html" class="text-primary">Daftar disini</a></p>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">
+                            Masuk
+                        </button>
+                    </div>
+                    
+                    <div class="form-text text-center">
+                        <a href="#" class="text-primary">Lupa password?</a>
+                    </div>
+                </form>
+                
+                <div class="demo-credentials" style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                    <h3 style="font-size: 1rem; margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Demo Credentials:</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Admin:</strong> username: <code>admin</code>, password: <code>admin123</code></p>
+                    <p style="font-size: 0.9rem;"><strong>User:</strong> username: <code>user</code>, password: <code>user123</code></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

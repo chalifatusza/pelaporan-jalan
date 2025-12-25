@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Saya - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Pengguna</div>
+                        <div class="user-role">Pengguna</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                    <a href="dashboard-user.html" class="btn btn-outline" style="margin-left: 10px;">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-user.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="laporan-baru.html"><i class="fas fa-plus-circle"></i> Buat Laporan</a></li>
+                        <li><a href="daftar-laporan.html" class="active"><i class="fas fa-list"></i> Laporan Saya</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+                    
+                    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h4>Filter Status</h4>
+                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px;">
+                            <button class="btn btn-outline btn-small filter-btn" data-status="all">Semua Laporan</button>
+                            <button class="btn btn-outline btn-small filter-btn" data-status="dikirim">Menunggu</button>
+                            <button class="btn btn-outline btn-small filter-btn" data-status="diproses">Diproses</button>
+                            <button class="btn btn-outline btn-small filter-btn" data-status="selesai">Selesai</button>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                            <h4>Statistik</h4>
+                            <div id="userStats" style="margin-top: 10px;">
+                                <p style="font-size: 0.9rem; margin: 5px 0;">Total: <span id="statTotal">0</span></p>
+                                <p style="font-size: 0.9rem; margin: 5px 0;">Diproses: <span id="statDiproses">0</span></p>
+                                <p style="font-size: 0.9rem; margin: 5px 0;">Selesai: <span id="statSelesai">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <div>
+                            <h1 class="dashboard-title">Laporan Saya</h1>
+                            <p>Kelola semua laporan kerusakan jalan yang telah Anda buat</p>
+                        </div>
+                        <div>
+                            <a href="laporan-baru.html" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i> Buat Laporan Baru
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Alert untuk filter aktif -->
+                    <div class="alert alert-info" id="filterAlert" style="display: none; margin-bottom: 20px;">
+                        <span>Menampilkan laporan dengan status: <span id="currentFilter">Semua</span></span>
+                        <button class="close-alert" onclick="clearFilter()">&times;</button>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                        <div style="flex: 1; position: relative;">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Cari judul atau lokasi...">
+                            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                        </div>
+                        <button class="btn btn-primary" id="searchBtn">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                        <button class="btn btn-outline" id="resetSearchBtn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-outline btn-small" id="viewTableBtn" onclick="switchView('table')">
+                            <i class="fas fa-table"></i> Tabel
+                        </button>
+                        <button class="btn btn-outline btn-small" id="viewCardBtn" onclick="switchView('card')">
+                            <i class="fas fa-th-large"></i> Kartu
+                        </button>
+                    </div>
+                    
+                    <!-- Table View -->
+                    <div class="table-responsive" id="tableView">
+                        <table class="table" id="laporanTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Judul</th>
+                                    <th>Lokasi</th>
+                                    <th>Kecamatan</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                    <th>Kerusakan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 40px;">
+                                        <i class="fas fa-spinner fa-spin"></i> Memuat data laporan...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Card View -->
+                    <div id="cardView" style="display: none;">
+                        <div class="card-grid" id="laporanCards">
+                            <!-- Kartu laporan akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- No Data Message -->
+                    <div id="noDataMessage" style="display: none; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-inbox fa-3x" style="color: #dee2e6; margin-bottom: 20px;"></i>
+                        <h3 style="color: #6c757d; margin-bottom: 10px;">Belum Ada Laporan</h3>
+                        <p style="color: #6c757d; margin-bottom: 20px;">Anda belum membuat laporan kerusakan jalan.</p>
+                        <a href="laporan-baru.html" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Buat Laporan Pertama Anda
+                        </a>
+                    </div>
+                    
+                    <!-- Tips Section -->
+                    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h3><i class="fas fa-lightbulb"></i> Tips Pelaporan yang Efektif</h3>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Ambil foto dengan jelas yang menunjukkan kerusakan jalan</li>
+                            <li>Berikan deskripsi yang detail tentang lokasi kerusakan</li>
+                            <li>Tentukan tingkat kerusakan dengan tepat</li>
+                            <li>Periksa status laporan Anda secara berkala</li>
+                            <li>Update laporan jika ada perubahan kondisi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let userLaporanData = [];
+        let currentView = 'table'; // 'table' or 'card'
+        let currentFilter = 'all';
+        let currentSearch = '';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserLaporan();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentFilter = this.dataset.status;
+                    document.getElementById('currentFilter').textContent = this.textContent;
+                    document.getElementById('filterAlert').style.display = 'flex';
+                    filterLaporan();
+                });
+            });
+            
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                currentSearch = document.getElementById('searchInput').value.trim();
+                filterLaporan();
+            });
+            
+            document.getElementById('resetSearchBtn').addEventListener('click', function() {
+                document.getElementById('searchInput').value = '';
+                currentSearch = '';
+                filterLaporan();
+                document.getElementById('filterAlert').style.display = 'none';
+            });
+            
+            // Enter key untuk search
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    currentSearch = this.value.trim();
+                    filterLaporan();
+                }
+            });
+            
+            // Initial view setup
+            switchView('table');
+        }
+        
+        function loadUserLaporan() {
+            fetch('api.php?action=get_laporan')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.laporan) {
+                        userLaporanData = data.data.laporan;
+                        displayLaporan();
+                        updateStats();
+                    } else {
+                        showNoData();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading laporan:', error);
+                    showNoData();
+                });
+        }
+        
+        function displayLaporan() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) {
+                showNoData();
+                return;
+            }
+            
+            // Update view based on current view mode
+            if (currentView === 'table') {
+                displayTableView(filteredData);
+            } else {
+                displayCardView(filteredData);
+            }
+            
+            // Show data containers
+            document.getElementById('noDataMessage').style.display = 'none';
+            document.getElementById('tableView').style.display = currentView === 'table' ? 'block' : 'none';
+            document.getElementById('cardView').style.display = currentView === 'card' ? 'block' : 'none';
+        }
+        
+        function displayTableView(laporanList) {
+            const tbody = document.querySelector('#laporanTable tbody');
+            
+            tbody.innerHTML = laporanList.map(laporan => `
+                <tr>
+                    <td>${laporan.id}</td>
+                    <td>
+                        <strong>${laporan.judul_laporan}</strong>
+                        ${laporan.deskripsi_kerusakan ? 
+                            `<div style="font-size: 0.85rem; color: #6c757d; margin-top: 5px;">
+                                ${laporan.deskripsi_kerusakan.substring(0, 60)}...
+                            </div>` : ''
+                        }
+                    </td>
+                    <td>${laporan.lokasi_jalan}</td>
+                    <td>${laporan.kecamatan}</td>
+                    <td>${formatDate(laporan.tanggal_laporan_formatted)}</td>
+                    <td>
+                        <span class="status-badge status-${laporan.status}">
+                            ${laporan.status}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="kerusakan-${laporan.tingkat_kerusakan} status-badge">
+                            ${laporan.tingkat_kerusakan}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <a href="edit-laporan.html?id=${laporan.id}" class="btn btn-outline btn-small" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-danger btn-small" onclick="deleteLaporan(${laporan.id})" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn btn-info btn-small" onclick="viewLaporanDetail(${laporan.id})" title="Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function displayCardView(laporanList) {
+            const container = document.getElementById('laporanCards');
+            
+            container.innerHTML = laporanList.map(laporan => `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">${laporan.judul_laporan}</h3>
+                        <div class="card-subtitle">${laporan.lokasi_jalan}</div>
+                    </div>
+                    <div class="card-body">
+                        ${laporan.foto_path ? 
+                            `<img src="${laporan.foto_path}" alt="Foto Kerusakan" style="width:100%;height:150px;object-fit:cover;border-radius:4px;margin-bottom:15px;">` :
+                            `<div style="width:100%;height:150px;background:#e9ecef;display:flex;align-items:center;justify-content:center;border-radius:4px;margin-bottom:15px;">
+                                <i class="fas fa-road fa-2x" style="color:#adb5bd;"></i>
+                            </div>`
+                        }
+                        <p><strong>Kecamatan:</strong> ${laporan.kecamatan}</p>
+                        <p><strong>Tanggal:</strong> ${formatDate(laporan.tanggal_laporan_formatted)}</p>
+                        <p><strong>Status:</strong> <span class="status-badge status-${laporan.status}">${laporan.status}</span></p>
+                        <p><strong>Kerusakan:</strong> <span class="kerusakan-${laporan.tingkat_kerusakan} status-badge">${laporan.tingkat_kerusakan}</span></p>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
+                            ${laporan.deskripsi_kerusakan.substring(0, 100)}...
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="edit-laporan.html?id=${laporan.id}" class="btn btn-outline btn-small">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <button class="btn btn-danger btn-small" onclick="deleteLaporan(${laporan.id})">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                        <button class="btn btn-info btn-small" onclick="viewLaporanDetail(${laporan.id})">
+                            <i class="fas fa-eye"></i> Detail
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getFilteredData() {
+            let filtered = userLaporanData;
+            
+            // Apply status filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(l => l.status === currentFilter);
+            }
+            
+            // Apply search filter
+            if (currentSearch) {
+                const searchTerm = currentSearch.toLowerCase();
+                filtered = filtered.filter(l => 
+                    l.judul_laporan.toLowerCase().includes(searchTerm) ||
+                    l.lokasi_jalan.toLowerCase().includes(searchTerm) ||
+                    l.kecamatan.toLowerCase().includes(searchTerm) ||
+                    l.deskripsi_kerusakan.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            return filtered;
+        }
+        
+        function filterLaporan() {
+            displayLaporan();
+            updateStats();
+        }
+        
+        function clearFilter() {
+            currentFilter = 'all';
+            currentSearch = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterAlert').style.display = 'none';
+            filterLaporan();
+        }
+        
+        function updateStats() {
+            const filteredData = getFilteredData();
+            const total = filteredData.length;
+            const diproses = filteredData.filter(l => l.status === 'diproses').length;
+            const selesai = filteredData.filter(l => l.status === 'selesai').length;
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statDiproses').textContent = diproses;
+            document.getElementById('statSelesai').textContent = selesai;
+        }
+        
+        function switchView(view) {
+            currentView = view;
+            
+            // Update button states
+            document.getElementById('viewTableBtn').classList.toggle('active', view === 'table');
+            document.getElementById('viewCardBtn').classList.toggle('active', view === 'card');
+            
+            // Add active class to selected button
+            if (view === 'table') {
+                document.getElementById('viewTableBtn').classList.add('btn-primary');
+                document.getElementById('viewTableBtn').classList.remove('btn-outline');
+                document.getElementById('viewCardBtn').classList.add('btn-outline');
+                document.getElementById('viewCardBtn').classList.remove('btn-primary');
+            } else {
+                document.getElementById('viewCardBtn').classList.add('btn-primary');
+                document.getElementById('viewCardBtn').classList.remove('btn-outline');
+                document.getElementById('viewTableBtn').classList.add('btn-outline');
+                document.getElementById('viewTableBtn').classList.remove('btn-primary');
+            }
+            
+            // Display appropriate view
+            displayLaporan();
+        }
+        
+        function showNoData() {
+            document.getElementById('noDataMessage').style.display = 'block';
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('cardView').style.display = 'none';
+            
+            // Update stats to 0
+            document.getElementById('statTotal').textContent = '0';
+            document.getElementById('statDiproses').textContent = '0';
+            document.getElementById('statSelesai').textContent = '0';
+        }
+        
+        function viewLaporanDetail(id) {
+            window.open(`detail-laporan.html?id=${id}`, '_blank');
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return dateString;
+            }
+        }
+    </script>
+</body>
+</html>

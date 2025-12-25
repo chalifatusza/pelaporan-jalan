@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #020617 0%, #4A8BDF 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            text-align: center;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .error-icon {
+            font-size: 120px;
+            color: #00DD00;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        h1 {
+            color: #020617;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #6c757d;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #00DD00;
+            color: #020617;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 221, 0, 0.3);
+        }
+        
+        .btn:hover {
+            background: #00AA00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 221, 0, 0.4);
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .error-code {
+            font-size: 1rem;
+            color: #A0006D;
+            margin-top: 30px;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 40px 30px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+            
+            .error-icon {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>Oops!</h1>
+        <p>Halaman yang Anda cari tidak ditemukan atau terjadi kesalahan. Silakan kembali ke halaman utama.</p>
+        <a href="index.html" class="btn">
+            <i class="fas fa-home"></i>
+            Kembali ke Beranda
+        </a>
+        <div class="error-code">
+            Error Code: <span id="errorCode">404</span>
+        </div>
+    </div>
+    
+    <script>
+        // Detect error code from URL or use default
+        const params = new URLSearchParams(window.location.search);
+        const errorCode = params.get('code') || '404';
+        document.getElementById('errorCode').textContent = errorCode;
+        
+        // Change message based on error code
+        const messages = {
+            '400': 'Permintaan tidak valid. Silakan periksa kembali data yang Anda kirim.',
+            '401': 'Anda tidak memiliki akses. Silakan login terlebih dahulu.',
+            '403': 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.',
+            '404': 'Halaman yang Anda cari tidak ditemukan.',
+            '500': 'Terjadi kesalahan pada server. Silakan coba lagi nanti.'
+        };
+        
+        const messageElement = document.querySelector('.error-container p');
+        if (messages[errorCode]) {
+            messageElement.textContent = messages[errorCode] + ' Silakan kembali ke halaman utama.';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pengguna - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Administrator</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu Admin</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="daftar-laporan-admin.html"><i class="fas fa-list"></i> Semua Laporan</a></li>
+                        <li><a href="kelola-pengguna.html" class="active"><i class="fas fa-users-cog"></i> Kelola Pengguna</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+                </div>
+                
+                <div class="dashboard-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <div>
+                            <h1 class="dashboard-title">Kelola Pengguna</h1>
+                            <p>Manajemen pengguna sistem pelaporan</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="searchUsers" class="form-control" placeholder="Cari username atau email..." style="flex: 1;">
+                        <select id="filterRole" class="form-control" style="width: 200px;">
+                            <option value="">Semua Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Total Laporan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <h3 style="color: #856404; margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> Peringatan</h3>
+                        <ul style="color: #856404; margin-left: 20px;">
+                            <li>Menghapus pengguna akan menghapus semua laporan yang dibuat oleh pengguna tersebut</li>
+                            <li>Akun admin tidak dapat dihapus atau diubah rolenya</li>
+                            <li>Pastikan Anda memiliki backup sebelum menghapus pengguna</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchUsers');
+            const filterRole = document.getElementById('filterRole');
+            let allUsers = [];
+            
+            // Search functionality
+            searchInput.addEventListener('input', filterUsers);
+            filterRole.addEventListener('change', filterUsers);
+            
+            function filterUsers() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const roleFilter = filterRole.value;
+                
+                const filtered = allUsers.filter(user => {
+                    const matchesSearch = user.username.toLowerCase().includes(searchTerm) || 
+                                         user.email.toLowerCase().includes(searchTerm) ||
+                                         user.nama_lengkap.toLowerCase().includes(searchTerm);
+                    const matchesRole = !roleFilter || user.role === roleFilter;
+                    return matchesSearch && matchesRole;
+                });
+                
+                displayUsers(filtered);
+            }
+            
+            // Load users on page load
+            loadUsersData();
+            
+            async function loadUsersData() {
+                try {
+                    const response = await fetch('api.php?action=get_all_users');
+                    const data = await response.json();
+                    
+                    if (data.success && data.data.users) {
+                        allUsers = data.data.users;
+                        displayUsers(allUsers);
+                    }
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                }
+            }
+            
+            function displayUsers(users) {
+                const tbody = document.querySelector('#usersTable tbody');
+                
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#6c757d">Tidak ada pengguna ditemukan</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = users.map(u => `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td><strong>${u.username}</strong></td>
+                        <td>${u.nama_lengkap}</td>
+                        <td>${u.email}</td>
+                        <td><span class="status-badge ${u.role === 'admin' ? 'status-selesai' : 'status-diproses'}">${u.role}</span></td>
+                        <td>${u.total_laporan}</td>
+                        <td>
+                            ${u.role !== 'admin' ? `
+                                <button class="btn btn-warning btn-small" onclick="toggleUserRole(${u.id}, '${u.role}')">
+                                    ${u.role === 'user' ? 'Jadikan Admin' : 'Jadikan User'}
+                                </button>
+                                <button class="btn btn-danger btn-small" onclick="deleteUserAccount(${u.id})">Hapus</button>
+                            ` : '<span style="color:#6c757d;"><i class="fas fa-shield-alt"></i> Admin</span>'}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            window.loadAllUsers = loadUsersData;
+        });
+    </script>
+</body>
+</html>
