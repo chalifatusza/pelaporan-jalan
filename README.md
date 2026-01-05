@@ -561,4 +561,5 @@ Untuk pertanyaan, bug report, atau feature request:
 **Dibuat dengan ❤️ untuk Kota Surabaya**
 
 
-*Terakhir diupdate: Desember 2024*
+*Terakhir diupdate: Desember 2025*
+
