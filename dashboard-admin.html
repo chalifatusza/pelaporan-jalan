@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .chart-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chart-card h3 i { color: var(--primary); }
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .charts-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        /* Clustering Data */
+        .cluster-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .cluster-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cluster-section h3 i { color: var(--primary); }
+        .cluster-list { list-style: none; padding: 0; }
+        .cluster-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        .cluster-item:last-child { border-bottom: none; }
+        .cluster-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .cluster-rank.rank-2 { background: #c8ff90; }
+        .cluster-rank.rank-3 { background: #e0f5b0; }
+        .cluster-rank.rank-4 { background: #e9ecef; }
+        .cluster-rank.rank-5 { background: #e9ecef; }
+        .cluster-info { flex: 1; }
+        .cluster-name { font-weight: 600; font-size: 0.9rem; }
+        .cluster-sub { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+        .cluster-bar-wrap {
+            flex: 1;
+            background: var(--gray-light);
+            border-radius: 20px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .cluster-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--blue));
+            border-radius: 20px;
+            transition: width 0.8s ease;
+        }
+        .cluster-count {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--dark);
+            min-width: 30px;
+            text-align: right;
+        }
+        /* Section title */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .badge-new {
+            background: var(--primary);
+            color: var(--dark);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        canvas { max-width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Administrator</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                    <a href="index.html" class="btn btn-outline" style="margin-left: 10px;">Beranda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- SIDEBAR -->
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu Admin</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="daftar-laporan-admin.html"><i class="fas fa-list"></i> Semua Laporan</a></li>
+                        <li><a href="peta-laporan.html"><i class="fas fa-map-marked-alt"></i> Peta Laporan</a></li>
+                        <li><a href="kelola-pengguna.html"><i class="fas fa-users-cog"></i> Kelola Pengguna</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+
+                    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h4>Statistik Cepat</h4>
+                        <div id="quickStats" style="margin-top: 10px;">
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Total: <span id="quick-total">0</span></p>
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Diproses: <span id="quick-diproses">0</span></p>
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Pengguna: <span id="quick-users">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT -->
+                <div class="dashboard-content">
+                    <h1 class="dashboard-title">Dashboard Administrator</h1>
+                    <p class="greeting">Halo, Administrator</p>
+
+                    <!-- STAT CARDS -->
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-road-circle-exclamation"></i></div>
+                            <div class="stat-number" id="admin-total-laporan">0</div>
+                            <div class="stat-label">Total Laporan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="stat-number" id="admin-laporan-diproses">0</div>
+                            <div class="stat-label">Dalam Proses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-road-circle-check"></i></div>
+                            <div class="stat-number" id="admin-laporan-selesai">0</div>
+                            <div class="stat-label">Selesai</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-number" id="admin-total-users">0</div>
+                            <div class="stat-label">Pengguna Terdaftar</div>
+                        </div>
+                    </div>
+
+                    <!-- ===== CHART SECTION ===== -->
+                    <div class="section-header">
+                        <h2 style="margin:0;">
+                            <i class="fas fa-chart-bar" style="color:var(--primary);margin-right:8px;"></i>
+                            Visualisasi Data
+                        </h2>
+                        <span class="badge-new">Chart.js</span>
+                    </div>
+
+                    <!-- Tambahkan ini di atas div chart, setelah card header -->
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+                        <select id="filter-range" onchange="reloadCharts()" 
+                            style="padding:8px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(200,169,110,0.3); 
+                                border-radius:8px; color:#fff; font-family:Poppins,sans-serif; font-size:0.85rem; cursor:pointer;">
+                            <option value="all">📅 Semua Waktu</option>
+                            <option value="7d">7 Hari Terakhir</option>
+                            <option value="30d">30 Hari Terakhir</option>
+                            <option value="3m">3 Bulan Terakhir</option>
+                        </select>
+                    </div>
+
+                    <!-- Baris 1: Status + Kerusakan -->
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <h3><i class="fas fa-chart-pie"></i> Laporan per Status</h3>
+                            <canvas id="statusChart" height="220"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Tingkat Kerusakan</h3>
+                            <canvas id="kerusakanChart" height="220"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Baris 2: Kecamatan (full width) -->
+                    <div class="chart-card">
+                        <h3><i class="fas fa-map-marker-alt"></i> Top 10 Kecamatan dengan Laporan Terbanyak</h3>
+                        <canvas id="kecamatanChart" height="120"></canvas>
+                    </div>
+
+                    <!-- ===== CLUSTERING DATA SECTION ===== -->
+                    <div class="section-header" style="margin-top:10px;">
+                        <h2 style="margin:0;">
+                            <i class="fas fa-layer-group" style="color:var(--primary);margin-right:8px;"></i>
+                            Clustering Laporan per Wilayah
+                        </h2>
+                        <a href="peta-laporan.html" class="btn btn-outline btn-small">
+                            <i class="fas fa-map"></i> Lihat di Peta
+                        </a>
+                    </div>
+
+                    <div class="cluster-section">
+                        <h3><i class="fas fa-trophy"></i> Top 5 Kecamatan — Hotspot Kerusakan</h3>
+                        <ul class="cluster-list" id="clusterList">
+                            <li style="text-align:center;padding:20px;color:var(--gray);">
+                                <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Tabel clustering detail -->
+                    <div class="cluster-section">
+                        <h3><i class="fas fa-table"></i> Detail Laporan per Kecamatan</h3>
+                        <div class="table-responsive">
+                            <table class="table" id="clusterTable">
+                                <thead>
+                                    <tr>
+                                        <th>Kecamatan</th>
+                                        <th>Total</th>
+                                        <th>Dikirim</th>
+                                        <th>Diproses</th>
+                                        <th>Selesai</th>
+                                        <th>Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:20px;color:var(--gray);">
+                                            <i class="fas fa-spinner fa-spin"></i> Memuat...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ===== LAPORAN TERBARU ===== -->
+                    <div class="section-header" style="margin-top:10px;">
+                        <h2 style="margin:0;">Laporan Terbaru</h2>
+                        <a href="daftar-laporan-admin.html" class="btn btn-outline btn-small">Lihat Semua</a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table" id="recentLaporanTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">ID</th>
+                                    <th>Judul</th>
+                                    <th>Pelapor</th>
+                                    <th>Lokasi</th>
+                                    <th>Kecamatan</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                    <th>Kerusakan</th>
+                                    <th style="width: 100px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" style="text-align:center;padding:20px;">
+                                        <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- QUICK ACTIONS -->
+                    <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h3><i class="fas fa-bolt"></i> Aksi Cepat</h3>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-outline" onclick="window.location.href='daftar-laporan-admin.html?status=dikirim'">
+                                <i class="fas fa-clock"></i> Laporan Baru
+                            </button>
+                            <button class="btn btn-outline" onclick="window.location.href='daftar-laporan-admin.html?status=diproses'">
+                                <i class="fas fa-tasks"></i> Sedang Diproses
+                            </button>
+                            <button class="btn btn-outline" onclick="window.location.href='peta-laporan.html'">
+                                <i class="fas fa-map-marked-alt"></i> Peta Clustering
+                            </button>
+                            <button class="btn btn-outline" id="refreshBtn">
+                                <i class="fas fa-sync-alt"></i> Refresh Data
+                            </button>
+                            <button class="btn btn-outline" onclick="exportReportData()">
+                                <i class="fas fa-download"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Chart instances
+        let statusChart = null, kerusakanChart = null, kecamatanChart = null;
+        // =============================================
+        // FILTER WAKTU — tambahkan di bawah deklarasi chart instances
+        // =============================================
+        function getRange() {
+            return document.getElementById('filter-range')?.value || 'all';
+        }
+
+        async function reloadCharts() {
+            await Promise.all([
+                loadStatusChart(),
+                loadKerusakanChart(),
+                loadKecamatanChart()
+            ]);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllDashboardData();
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+                loadAllDashboardData();
+                setTimeout(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data'; }, 1500);
+            });
+        });
+
+        async function loadAllDashboardData() {
+            await Promise.all([
+                loadAdminStats(),
+                loadRecentLaporan(),
+                loadStatusChart(),
+                loadKerusakanChart(),
+                loadKecamatanChart(),
+                loadClusteringData()
+            ]);
+        }
+
+        // =============================================
+        // STATS
+        // =============================================
+        async function loadAdminStats() {
+            try {
+                const res  = await fetch('api.php?action=get_stats');
+                const data = await res.json();
+                if (data.success && data.data.stats) {
+                    const s = data.data.stats;
+                    document.getElementById('admin-total-laporan').textContent   = s.total_laporan || 0;
+                    document.getElementById('admin-laporan-diproses').textContent = s.status_stats?.diproses || 0;
+                    document.getElementById('admin-laporan-selesai').textContent  = s.status_stats?.selesai  || 0;
+                    document.getElementById('admin-total-users').textContent      = s.total_users || 0;
+                    document.getElementById('quick-total').textContent    = s.total_laporan || 0;
+                    document.getElementById('quick-diproses').textContent = s.status_stats?.diproses || 0;
+                    document.getElementById('quick-users').textContent    = s.total_users || 0;
+                    animateCounters();
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadRecentLaporan() {
+            try {
+                const res  = await fetch('api.php?action=get_laporan');
+                const data = await res.json();
+                if (data.success && data.data.laporan) {
+                    const tbody = document.querySelector('#recentLaporanTable tbody');
+                    const list  = data.data.laporan.slice(0, 5);
+                    if (list.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:30px;">Belum ada laporan</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = list.map(l => `
+                        <tr>
+                            <td>${l.id}</td>
+                            <td><strong>${l.judul_laporan}</strong></td>
+                            <td>${l.nama_lengkap || l.username}</td>
+                            <td>${l.lokasi_jalan}</td>
+                            <td>${formatDate(l.tanggal_laporan_formatted)}</td>
+                            <td><span class="status-badge status-${l.status}">${l.status}</span></td>
+                            <td>
+                                <a href="edit-laporan.html?id=${l.id}" class="btn btn-outline btn-small" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="detail-laporan.html?id=${l.id}" class="btn btn-info btn-small" title="Detail" target="_blank">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // =============================================
+        // CHART 1: STATUS — dengan filter waktu
+        // =============================================
+        async function loadStatusChart() {
+            try {
+                const range = getRange();
+                const res   = await fetch(`api.php?action=get_status_stats_filtered&range=${range}`);
+                const data  = await res.json();
+
+                // Fallback ke endpoint lama jika endpoint baru belum ada
+                const stats = data.success ? data.data
+                    : await fetch('api.php?action=get_status_stats')
+                        .then(r => r.json())
+                        .then(d => d.data?.stats || []);
+
+                const labels   = (data.success ? stats : stats).map(s => capitalizeFirst(s.status));
+                const values   = (data.success ? stats : stats).map(s => parseInt(s.total));
+                const colorMap = { 'Dikirim': '#FFC107', 'Diproses': '#4A8BDF', 'Selesai': '#00DD00' };
+                const bgColors = labels.map(l => colorMap[l] || '#adb5bd');
+
+                const ctx = document.getElementById('statusChart');
+                if (statusChart) statusChart.destroy();
+                statusChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data: values, backgroundColor: bgColors, borderWidth: 2, borderColor: '#fff' }] },
+                    options: {
+                        responsive: true,
+                        cutout: '65%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { family: 'Poppins' } } },
+                            tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} laporan` } }
+                        }
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // =============================================
+        // CHART 2: KERUSAKAN — dengan filter waktu
+        // =============================================
+        async function loadKerusakanChart() {
+            try {
+                const range = getRange();
+                const res   = await fetch(`api.php?action=get_kerusakan_stats_filtered&range=${range}`);
+                const data  = await res.json();
+
+                const raw    = data.success ? data.data
+                    : await fetch('api.php?action=get_kerusakan_stats')
+                        .then(r => r.json())
+                        .then(d => d.data?.stats || []);
+                const stats  = data.success ? raw : raw;
+                const labels = stats.map(s => capitalizeFirst(s.tingkat_kerusakan));
+                const values = stats.map(s => parseInt(s.total));
+                const colorMap = { 'Ringan': '#00DD00', 'Sedang': '#FFC107', 'Berat': '#dc3545' };
+                const bgColors = labels.map(l => colorMap[l] || '#4A8BDF');
+
+                const ctx = document.getElementById('kerusakanChart');
+                if (kerusakanChart) kerusakanChart.destroy();
+                kerusakanChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Jumlah Laporan', data: values, backgroundColor: bgColors, borderRadius: 6, borderWidth: 0 }] },
+                    options: {
+                        responsive: true,
+                        indexAxis: 'y',
+                        scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: ctx => ` ${ctx.raw} laporan` } }
+                        }
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // =============================================
+        // CHART 3: KECAMATAN — dengan filter waktu
+        // =============================================
+        async function loadKecamatanChart() {
+            try {
+                const range = getRange();
+                const res   = await fetch(`api.php?action=get_kecamatan_stats_filtered&range=${range}`);
+                const data  = await res.json();
+
+                const raw   = data.success ? data.data
+                    : await fetch('api.php?action=get_kecamatan_stats')
+                        .then(r => r.json())
+                        .then(d => d.data?.stats || []);
+                const stats = (data.success ? raw : raw).slice(0, 10);
+
+                const labels   = stats.map(s => s.kecamatan);
+                const selesai  = stats.map(s => parseInt(s.selesai  || 0));
+                const diproses = stats.map(s => parseInt(s.diproses || 0));
+                const dikirim  = stats.map(s => parseInt(s.dikirim  || 0));
+
+                const ctx = document.getElementById('kecamatanChart');
+                if (kecamatanChart) kecamatanChart.destroy();
+                kecamatanChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Selesai',  data: selesai,  backgroundColor: '#00DD00', borderRadius: 4, borderWidth: 0 },
+                            { label: 'Diproses', data: diproses, backgroundColor: '#4A8BDF', borderRadius: 4, borderWidth: 0 },
+                            { label: 'Dikirim',  data: dikirim,  backgroundColor: '#FFC107', borderRadius: 4, borderWidth: 0 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { stacked: true },
+                            y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+                        },
+                        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins' } } } }
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // =============================================
+        // CLUSTERING DATA
+        // =============================================
+        async function loadClusteringData() {
+            try {
+                const res  = await fetch('api.php?action=get_kecamatan_stats');
+                const data = await res.json();
+                if (!data.success) return;
+
+                const stats   = data.data.stats;
+                const top5    = stats.slice(0, 5);
+                const maxTotal = top5.length > 0 ? parseInt(top5[0].total) : 1;
+
+                // Render top 5 visual list
+                const clusterList = document.getElementById('clusterList');
+                clusterList.innerHTML = top5.map((item, i) => {
+                    const pct = Math.round((parseInt(item.total) / maxTotal) * 100);
+                    const selesaiPct = item.total > 0
+                        ? Math.round((parseInt(item.selesai) / parseInt(item.total)) * 100)
+                        : 0;
+                    return `
+                        <li class="cluster-item">
+                            <div class="cluster-rank rank-${i+1}">${i+1}</div>
+                            <div class="cluster-info">
+                                <div class="cluster-name">${item.kecamatan}</div>
+                                <div class="cluster-sub">
+                                    ${item.dikirim} menunggu &bull;
+                                    ${item.diproses} diproses &bull;
+                                    ${item.selesai} selesai &bull;
+                                    <span style="color:var(--primary);font-weight:600;">${selesaiPct}% selesai</span>
+                                </div>
+                            </div>
+                            <div class="cluster-bar-wrap">
+                                <div class="cluster-bar" style="width:${pct}%"></div>
+                            </div>
+                            <div class="cluster-count">${item.total}</div>
+                        </li>
+                    `;
+                }).join('');
+
+                // Render tabel clustering detail (semua kecamatan)
+                const tbody = document.querySelector('#clusterTable tbody');
+                if (stats.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:20px;">Belum ada data</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = stats.map((item, i) => {
+                    const selesaiPct = item.total > 0
+                        ? Math.round((parseInt(item.selesai) / parseInt(item.total)) * 100)
+                        : 0;
+                    return `
+                        <tr>
+                            <td><strong>${item.kecamatan}</strong></td>
+                            <td><span style="font-weight:700;">${item.total}</span></td>
+                            <td><span class="status-badge status-dikirim">${item.dikirim}</span></td>
+                            <td><span class="status-badge status-diproses">${item.diproses}</span></td>
+                            <td><span class="status-badge status-selesai">${item.selesai}</span></td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div style="flex:1;background:var(--gray-light);border-radius:20px;height:6px;overflow:hidden;">
+                                        <div style="width:${selesaiPct}%;height:100%;background:var(--primary);border-radius:20px;"></div>
+                                    </div>
+                                    <span style="font-size:0.8rem;color:var(--gray);min-width:35px;">${selesaiPct}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch(e) { console.error(e); }
+        }
+
+        // =============================================
+        // HELPERS
+        // =============================================
+        function capitalizeFirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                return new Date(dateString).toLocaleDateString('id-ID', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+            } catch(e) { return dateString; }
+        }
+
+        function animateCounters() {
+            document.querySelectorAll('.stat-number').forEach(counter => {
+                const target = +counter.textContent;
+                const inc = target / 50;
+                let current = 0;
+                const tick = () => {
+                    if (current < target) {
+                        current += inc;
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(tick, 30);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+                tick();
+            });
+        }
+
+        function exportReportData() {
+            fetch('api.php?action=get_laporan')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) return;
+                    const headers = ['ID','Judul','Pelapor','Lokasi','Kecamatan','Status','Kerusakan','Lat','Lng','Tanggal'];
+                    const rows = data.data.laporan.map(l => [
+                        l.id,
+                        `"${l.judul_laporan}"`,
+                        `"${l.nama_lengkap}"`,
+                        `"${l.lokasi_jalan}"`,
+                        l.kecamatan,
+                        l.status,
+                        l.tingkat_kerusakan,
+                        l.latitude || '',
+                        l.longitude || '',
+                        l.tanggal_laporan_formatted
+                    ]);
+                    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                    const url  = URL.createObjectURL(blob);
+                    const a    = document.createElement('a');
+                    a.href = url;
+                    a.download = `laporan_jalan_${new Date().toISOString().split('T')[0]}.csv`;
+                    a.click();
+                    showAlert('success', 'Data berhasil diexport!');
+                });
+        }
+    </script>
+</body>
+</html>

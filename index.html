@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantau Jalan - Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="active">Beranda</a></li>
+                    <li><a href="#tentang">Tentang</a></li>
+                    <li><a href="#cara-lapor">Cara Lapor</a></li>
+                    <li><a href="#kontak">Kontak</a></li>
+                    <li id="dashboardLink" style="display: none;"><a href="#" id="dashboardLinkAnchor">Dashboard</a></li>
+                </ul>
+                <div class="nav-buttons" id="authButtons">
+                    <!-- Buttons akan diisi oleh JavaScript -->
+                </div>
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Laporkan Jalan Rusak di Surabaya</h1>
+                <p class="hero-subtitle">Bantu perbaiki kota kita dengan melaporkan kerusakan jalan yang Anda temui. Bersama kita wujudkan Surabaya yang lebih baik!</p>
+                <div class="hero-buttons" id="heroAuthButtons">
+                    <!-- Buttons akan diisi oleh JavaScript -->
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="jalan baru.jpg" alt="Jalan Rusak">
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 40px;">Statistik Laporan</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-road-circle-exclamation"></i>
+                    </div>
+                    <div class="stat-number" id="laporan-count">0</div>
+                    <div class="stat-label">Laporan Diterima</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-road-circle-check"></i>
+                    </div>
+                    <div class="stat-number" id="selesai-count">0</div>
+                    <div class="stat-label">Laporan Selesai</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" id="user-count">0</div>
+                    <div class="stat-label">Pengguna Terdaftar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-location-dot"></i>
+                    </div>
+                    <div class="stat-number">31</div>
+                    <div class="stat-label">Kecamatan Tercover</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cara Melapor Section -->
+    <section class="cara-lapor" id="cara-lapor">
+        <div class="container">
+            <h2 class="section-title">Cara Melaporkan Jalan Rusak</h2>
+            <p class="section-subtitle">Ikuti langkah-langkah mudah berikut untuk melaporkan kerusakan jalan</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Daftar / Masuk</h3>
+                    <p>Buat akun atau masuk ke akun Anda yang sudah terdaftar</p>
+                    <div id="step1Buttons" class="step-buttons">
+                        <!-- Tombol login/register akan diisi berdasarkan status login -->
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-location-dot"></i>
+                    </div>
+                    <h3>Tentukan Lokasi</h3>
+                    <p>Temukan lokasi jalan yang rusak di peta atau ketik alamatnya</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Upload Foto</h3>
+                    <p>Ambil foto kerusakan jalan sebagai bukti visual</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3>Kirim Laporan</h3>
+                    <p>Isi formulir dan kirim laporan untuk ditindaklanjuti</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login/Register Section -->
+    <section class="auth-section" id="authSection" style="padding: 80px 0; background-color: #f8f9fa;">
+        <div class="container">
+            <div class="auth-container" style="display: flex; gap: 40px; align-items: stretch;">
+                <div class="auth-card" style="flex: 1; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <h2 style="margin-bottom: 20px; color: #333;">Sudah Punya Akun?</h2>
+                    <p style="margin-bottom: 30px; color: #666;">Masuk ke akun Anda untuk mulai melaporkan kerusakan jalan</p>
+                    <a href="login.html" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;">
+                        <i class="fas fa-sign-in-alt"></i> Masuk Sekarang
+                    </a>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <p style="color: #666; font-size: 0.9rem;">Demo: admin / admin123</p>
+                    </div>
+                </div>
+                
+                <div class="auth-card" style="flex: 1; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <h2 style="margin-bottom: 20px; color: #333;">Belum Punya Akun?</h2>
+                    <p style="margin-bottom: 30px; color: #666;">Daftar sekarang untuk menjadi bagian dari perbaikan kota Surabaya</p>
+                    <a href="register.html" class="btn btn-outline" style="width: 100%; padding: 14px; font-size: 1.1rem; border-width: 2px;">
+                        <i class="fas fa-user-plus"></i> Daftar Gratis
+                    </a>
+                    <div style="margin-top: 20px;">
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 10px;"></i>
+                                <span>Laporkan kerusakan jalan dengan mudah</span>
+                            </li>
+                            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 10px;"></i>
+                                <span>Pantau status laporan Anda</span>
+                            </li>
+                            <li style="display: flex; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 10px;"></i>
+                                <span>Berkontribusi untuk Surabaya yang lebih baik</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tentang Section -->
+    <section class="tentang" id="tentang">
+        <div class="container">
+            <div class="tentang-content">
+                <div class="tentang-text">
+                    <h2 class="section-title">Tentang Kami</h2>
+                    <p>Platform ini dibuat untuk memudahkan warga Surabaya dalam melaporkan kerusakan jalan di wilayah mereka. Dengan sistem ini, laporan akan langsung terkirim ke pihak berwenang untuk ditindaklanjuti.</p>
+                    <p>Kami berkomitmen untuk meningkatkan kualitas infrastruktur jalan di Surabaya melalui partisipasi aktif masyarakat.</p>
+                    <div class="tentang-features">
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Sistem Terjamin</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-clock"></i>
+                            <span>Respon Cepat</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Transparan</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="tentang-image">
+                    <img src="https://images.unsplash.com/photo-1569336415962-a1bd7616c7c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Tentang Kami">
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="kontak">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-road"></i>
+                        <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                    </div>
+                    <p>Platform pelaporan kerusakan jalan untuk Kota Surabaya. Bersama kita wujudkan Surabaya yang lebih baik.</p>
+        
+                </div>
+                <div class="footer-section">
+                    <h3>Kontak</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Jl. Pemuda No. 123, Surabaya</li>
+                        <li><i class="fas fa-phone"></i> (031) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@jalanrusak.surabaya.id</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Link Cepat</h3>
+                    <ul>
+                        <li><a href="index.html">Beranda</a></li>
+                        <li><a href="login.html">Masuk</a></li>
+                        <li><a href="register.html">Daftar</a></li>
+                        <li><a href="#cara-lapor">Cara Melapor</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024D/Kelompok2.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Check login status dan update UI
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatusForHomepage();
+            loadStatsFromServer();
+            
+            // Initialize mobile menu
+            initMobileMenu();
+        });
+        
+        async function checkLoginStatusForHomepage() {
+            try {
+                const response = await fetch('api.php?action=check_session');
+                const data = await response.json();
+                
+                const authButtons = document.getElementById('authButtons');
+                const heroAuthButtons = document.getElementById('heroAuthButtons');
+                const dashboardLink = document.getElementById('dashboardLink');
+                const dashboardLinkAnchor = document.getElementById('dashboardLinkAnchor');
+                const authSection = document.getElementById('authSection');
+                const step1Buttons = document.getElementById('step1Buttons');
+                
+                if (data.success) {
+                    // User sudah login
+                    const user = data.data.user;
+                    
+                    // Update navbar
+                    dashboardLink.style.display = 'block';
+                    dashboardLinkAnchor.href = user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html';
+                    dashboardLinkAnchor.textContent = user.role === 'admin' ? 'Dashboard Admin' : 'Dashboard Saya';
+                    
+                    // Update navbar buttons
+                    authButtons.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="text-align: right;">
+                                <div style="font-weight: 500; font-size: 0.9rem;">Halo,</div>
+                                <div style="font-weight: 600;">${user.nama}</div>
+                            </div>
+                            <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-primary">Dashboard</a>
+                            <button class="btn btn-outline logout-btn-homepage">Logout</button>
+                        </div>
+                    `;
+                    
+                    // Update hero buttons
+                    heroAuthButtons.innerHTML = `
+                        <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-primary btn-large">Buka Dashboard</a>
+                        ${user.role === 'user' ? '<a href="laporan-baru.html" class="btn btn-outline btn-large">Buat Laporan Baru</a>' : ''}
+                    `;
+                    
+                    // Hide login/register section
+                    authSection.style.display = 'none';
+                    
+                    // Update step 1 buttons
+                    step1Buttons.innerHTML = `
+                        <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-outline btn-small" style="margin-top: 10px;">Dashboard Saya</a>
+                    `;
+                    
+                    // Add logout functionality
+                    document.querySelector('.logout-btn-homepage').addEventListener('click', logout);
+                } else {
+                    // User belum login
+                    dashboardLink.style.display = 'none';
+                    
+                    // Update navbar buttons
+                    authButtons.innerHTML = `
+                        <a href="login.html" class="btn btn-outline">Masuk</a>
+                        <a href="register.html" class="btn btn-primary">Daftar</a>
+                    `;
+                    
+                    // Update hero buttons
+                    heroAuthButtons.innerHTML = `
+                        <a href="login.html" class="btn btn-primary btn-large">Mulai Laporkan</a>
+                        <a href="#cara-lapor" class="btn btn-outline btn-large">Cara Melapor</a>
+                    `;
+                    
+                    // Show login/register section
+                    authSection.style.display = 'block';
+                    
+                    // Update step 1 buttons
+                    step1Buttons.innerHTML = `
+                        <div style="display: flex; gap: 10px; margin-top: 10px; margin-left: 27px;">
+                            <a href="login.html" class="btn btn-outline btn-small">Masuk</a>
+                            <a href="register.html" class="btn btn-primary btn-small">Daftar</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                // Default ke tampilan belum login jika error
+                showDefaultGuestView();
+            }
+        }
+        
+        function showDefaultGuestView() {
+            const authButtons = document.getElementById('authButtons');
+            const heroAuthButtons = document.getElementById('heroAuthButtons');
+            const dashboardLink = document.getElementById('dashboardLink');
+            const authSection = document.getElementById('authSection');
+            const step1Buttons = document.getElementById('step1Buttons');
+            
+            dashboardLink.style.display = 'none';
+            
+            authButtons.innerHTML = `
+                <a href="login.html" class="btn btn-outline">Masuk</a>
+                <a href="register.html" class="btn btn-primary">Daftar</a>
+            `;
+            
+            heroAuthButtons.innerHTML = `
+                <a href="login.html" class="btn btn-primary btn-large">Mulai Laporkan</a>
+                <a href="#cara-lapor" class="btn btn-outline btn-large">Cara Melapor</a>
+            `;
+            
+            authSection.style.display = 'block';
+            
+            step1Buttons.innerHTML = `
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <a href="login.html" class="btn btn-outline btn-small">Masuk</a>
+                    <a href="register.html" class="btn btn-primary btn-small">Daftar</a>
+                </div>
+            `;
+        }
+        
+        function initMobileMenu() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            const navButtons = document.querySelector('.nav-buttons');
+            
+            if (hamburger) {
+                hamburger.addEventListener('click', function() {
+                    const isVisible = navMenu.style.display === 'flex';
+                    
+                    if (!isVisible) {
+                        navMenu.style.display = 'flex';
+                        navButtons.style.display = 'flex';
+                        
+                        navMenu.style.flexDirection = 'column';
+                        navMenu.style.position = 'absolute';
+                        navMenu.style.top = '100%';
+                        navMenu.style.left = '0';
+                        navMenu.style.width = '100%';
+                        navMenu.style.backgroundColor = 'white';
+                        navMenu.style.padding = '20px';
+                        navMenu.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+                        navMenu.style.zIndex = '1000';
+                        
+                        navButtons.style.flexDirection = 'column';
+                        navButtons.style.position = 'absolute';
+                        navButtons.style.top = navMenu.clientHeight + 100 + 'px';
+                        navButtons.style.left = '0';
+                        navButtons.style.width = '100%';
+                        navButtons.style.padding = '20px';
+                        navButtons.style.backgroundColor = 'white';
+                        navButtons.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+                        navButtons.style.zIndex = '1000';
+                    } else {
+                        navMenu.style.display = 'none';
+                        navButtons.style.display = 'none';
+                    }
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!event.target.closest('.navbar') && 
+                        !event.target.closest('.hamburger') && 
+                        navMenu.style.display === 'flex') {
+                        navMenu.style.display = 'none';
+                        navButtons.style.display = 'none';
+                    }
+                });
+            }
+        }
+        
+        async function logout() {
+            if (!confirm('Apakah Anda yakin ingin logout?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('api.php?action=logout');
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Gagal logout. Silakan coba lagi.');
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                alert('Terjadi kesalahan saat logout. Silakan coba lagi.');
+            }
+        }
+        
+        async function loadStatsFromServer() {
+            try {
+                const response = await fetch('api.php?action=get_stats');
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    const stats = data.data.stats;
+                    document.getElementById('laporan-count').textContent = stats.total_laporan || '0';
+                    document.getElementById('selesai-count').textContent = stats.laporan_selesai || '0';
+                    document.getElementById('user-count').textContent = stats.total_users || '0';
+                    
+                    animateCounters();
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Set default values if error
+                document.getElementById('laporan-count').textContent = '1247';
+                document.getElementById('selesai-count').textContent = '892';
+                document.getElementById('user-count').textContent = '543';
+                animateCounters();
+            }
+        }
+        
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = +counter.textContent;
+                const increment = target / 100;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, 20);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

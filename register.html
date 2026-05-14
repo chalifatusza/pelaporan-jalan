@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="nav-buttons">
+                    <a href="index.html" class="btn btn-outline">Kembali ke Beranda</a>
+                </div>
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="form-container">
+                <h1 class="form-title">Buat Akun Baru</h1>
+                <p class="text-center" style="margin-bottom: 30px;">Sudah punya akun? <a href="login.html" class="text-primary">Masuk disini</a></p>
+                
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username *</label>
+                        <input type="text" id="username" class="form-control" placeholder="Masukkan username" required>
+                        <div class="form-text">Username harus unik dan minimal 3 karakter</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nama_lengkap" class="form-label">Nama Lengkap *</label>
+                        <input type="text" id="nama_lengkap" class="form-control" placeholder="Masukkan nama lengkap" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email *</label>
+                        <input type="email" id="email" class="form-control" placeholder="Masukkan email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <textarea id="alamat" class="form-control" placeholder="Masukkan alamat" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="no_telepon" class="form-label">No. Telepon</label>
+                        <input type="text" id="no_telepon" class="form-control" placeholder="Masukkan nomor telepon">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password *</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Password minimal 6 karakter</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Konfirmasi Password *</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Konfirmasi password" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">Daftar</button>
+                    </div>
+                    
+                    <div class="form-text text-center">
+                        Dengan mendaftar, Anda menyetujui <a href="#" class="text-primary">Syarat & Ketentuan</a> kami
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

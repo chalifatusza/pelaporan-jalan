@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Laporan Baru - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 350px;
+            border-radius: var(--radius);
+            margin-top: 10px;
+            border: 2px solid var(--gray-light);
+            z-index: 1;
+            transition: border-color 0.3s ease;
+        }
+        #map:hover { border-color: var(--primary); }
+        #map.map-selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 221, 0, 0.2);
+        }
+        .map-tooltip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        .map-tooltip i { color: var(--blue); }
+        .map-coords {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 221, 0, 0.08);
+            border: 1px solid rgba(0, 221, 0, 0.3);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        .map-coords i { color: var(--primary); }
+        .map-coords.visible { display: flex; }
+        .gps-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 9px 16px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .gps-btn:hover { background: #3a7bcf; transform: translateY(-1px); }
+        .gps-btn:disabled { background: var(--gray); cursor: not-allowed; transform: none; }
+        .map-reset-btn {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            margin-left: 8px;
+            padding: 9px 14px;
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+        }
+        .map-reset-btn:hover { background: var(--danger); color: white; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Pengguna</div>
+                        <div class="user-role">Pengguna</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-user.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="laporan-baru.html" class="active"><i class="fas fa-plus-circle"></i> Buat Laporan</a></li>
+                        <li><a href="daftar-laporan.html"><i class="fas fa-list"></i> Laporan Saya</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+                </div>
+
+                <div class="dashboard-content">
+                    <h1 class="dashboard-title">Buat Laporan Baru</h1>
+                    <p>Laporkan kerusakan jalan yang Anda temui di Surabaya. Pastikan data yang Anda berikan akurat dan lengkap.</p>
+
+                    <form id="laporanForm" style="margin-top: 20px;">
+
+                        <!-- Judul -->
+                        <div class="form-group">
+                            <label for="judul_laporan" class="form-label">Judul Laporan *</label>
+                            <input type="text" id="judul_laporan" class="form-control"
+                                placeholder="Contoh: Lubang besar di Jl. Raya Darmo" required>
+                            <div class="form-text">Buat judul yang deskriptif dan jelas</div>
+                        </div>
+
+                        <!-- Lokasi -->
+                        <div class="form-group">
+                            <label for="lokasi_jalan" class="form-label">Lokasi Jalan *</label>
+                            <input type="text" id="lokasi_jalan" class="form-control"
+                                placeholder="Contoh: Jl. Raya Darmo, depan Mall BG Junction" required>
+                        </div>
+
+                        <!-- Kecamatan -->
+                        <div class="form-group">
+                            <label for="kecamatan" class="form-label">Kecamatan *</label>
+                            <select id="kecamatan" class="form-control" required>
+                                <option value="">Pilih Kecamatan</option>
+                                <option value="Asemrowo">Asemrowo</option>
+                                <option value="Benowo">Benowo</option>
+                                <option value="Bubutan">Bubutan</option>
+                                <option value="Bulak">Bulak</option>
+                                <option value="Dukuh Pakis">Dukuh Pakis</option>
+                                <option value="Gayungan">Gayungan</option>
+                                <option value="Genteng">Genteng</option>
+                                <option value="Gubeng">Gubeng</option>
+                                <option value="Gunung Anyar">Gunung Anyar</option>
+                                <option value="Jambangan">Jambangan</option>
+                                <option value="Karangpilang">Karangpilang</option>
+                                <option value="Kenjeran">Kenjeran</option>
+                                <option value="Krembangan">Krembangan</option>
+                                <option value="Lakarsantri">Lakarsantri</option>
+                                <option value="Mulyorejo">Mulyorejo</option>
+                                <option value="Pabean Cantian">Pabean Cantian</option>
+                                <option value="Pakal">Pakal</option>
+                                <option value="Rungkut">Rungkut</option>
+                                <option value="Sambikerep">Sambikerep</option>
+                                <option value="Sawahan">Sawahan</option>
+                                <option value="Semampir">Semampir</option>
+                                <option value="Simokerto">Simokerto</option>
+                                <option value="Sukolilo">Sukolilo</option>
+                                <option value="Sukomanunggal">Sukomanunggal</option>
+                                <option value="Tambaksari">Tambaksari</option>
+                                <option value="Tandes">Tandes</option>
+                                <option value="Tegalsari">Tegalsari</option>
+                                <option value="Tenggilis Mejoyo">Tenggilis Mejoyo</option>
+                                <option value="Wiyung">Wiyung</option>
+                                <option value="Wonocolo">Wonocolo</option>
+                                <option value="Wonokromo">Wonokromo</option>
+                            </select>
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="form-group">
+                            <label for="deskripsi_kerusakan" class="form-label">Deskripsi Kerusakan *</label>
+                            <textarea id="deskripsi_kerusakan" class="form-control"
+                                placeholder="Jelaskan secara detail kerusakan jalan yang Anda temui" rows="5" required></textarea>
+                            <div class="form-text">Jelaskan jenis kerusakan, ukuran, dan potensi bahaya yang ditimbulkan</div>
+                        </div>
+
+                        <!-- Tingkat Kerusakan -->
+                        <div class="form-group">
+                            <label for="tingkat_kerusakan" class="form-label">Tingkat Kerusakan *</label>
+                            <select id="tingkat_kerusakan" class="form-control" required>
+                                <option value="">Pilih Tingkat Kerusakan</option>
+                                <option value="ringan">Ringan (retak kecil, permukaan tidak rata)</option>
+                                <option value="sedang">Sedang (lubang kecil, kerusakan sedang)</option>
+                                <option value="berat">Berat (lubang besar, jalan ambles, sangat berbahaya)</option>
+                            </select>
+                        </div>
+
+                        <!-- ===== MAP SECTION ===== -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marked-alt" style="color: var(--primary); margin-right: 6px;"></i>
+                                Pilih Lokasi di Peta *
+                            </label>
+
+                            <div class="map-tooltip" id="mapTooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Klik pada peta untuk menandai lokasi kerusakan, atau gunakan tombol GPS di bawah</span>
+                            </div>
+
+                            <div id="map"></div>
+
+                            <div style="display: flex; flex-wrap: wrap; align-items: center;">
+                                <button type="button" class="gps-btn" id="gpsBtn" onclick="getMyLocation()">
+                                    <i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)
+                                </button>
+                                <button type="button" class="map-reset-btn" id="resetMapBtn" onclick="resetMap()">
+                                    <i class="fas fa-times"></i> Reset Lokasi
+                                </button>
+                            </div>
+
+                            <div class="map-coords" id="mapCoordsDisplay">
+                                <i class="fas fa-map-pin"></i>
+                                <span>Koordinat: <strong id="latDisplay">-</strong>, <strong id="lngDisplay">-</strong></span>
+                            </div>
+
+                            <!-- Hidden inputs koordinat -->
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
+                        </div>
+
+                        <!-- ===== UPLOAD FOTO ===== -->
+                        <div class="form-group">
+                            <label for="foto" class="form-label">Foto Kerusakan</label>
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Klik untuk upload atau drag & drop foto</p>
+                                <p style="font-size: 0.9rem; color: var(--gray);">Format: JPG, PNG (Maks. 5MB)</p>
+                            </div>
+                            <input type="file" id="foto" accept="image/*" style="display: none;">
+                            <img id="preview-image" src="" alt="Preview"
+                                style="display: none; max-width: 100%; max-height: 300px; margin-top: 15px; border-radius: 8px;">
+                            <div class="form-text">Foto akan membantu tim penanganan memahami kondisi kerusakan</div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-large" style="width: 100%;" id="submitBtn">
+                                <i class="fas fa-paper-plane"></i> Kirim Laporan
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // =============================================
+        // MAP INIT
+        // =============================================
+        let map, marker;
+        const SURABAYA = [-7.2575, 112.7521];
+
+        function initMap() {
+            map = L.map('map').setView(SURABAYA, 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Klik peta → set koordinat
+            map.on('click', function(e) {
+                setMapLocation(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function setMapLocation(lat, lng) {
+            if (marker) {
+                marker.setLatLng([lat, lng]);
+            } else {
+                marker = L.marker([lat, lng]).addTo(map);
+            }
+
+            marker.bindPopup(
+                `<b>Lokasi Kerusakan</b><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`
+            ).openPopup();
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            document.getElementById('latDisplay').textContent = lat.toFixed(6);
+            document.getElementById('lngDisplay').textContent = lng.toFixed(6);
+            document.getElementById('mapCoordsDisplay').classList.add('visible');
+            document.getElementById('map').classList.add('map-selected');
+            document.getElementById('resetMapBtn').style.display = 'inline-flex';
+            document.getElementById('mapTooltip').style.display = 'none';
+        }
+
+        // =============================================
+        // GPS
+        // =============================================
+        function getMyLocation() {
+            const btn = document.getElementById('gpsBtn');
+            if (!navigator.geolocation) {
+                showAlert('error', 'Browser Anda tidak mendukung fitur GPS');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...';
+
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    map.setView([lat, lng], 17);
+                    setMapLocation(lat, lng);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)';
+                    showAlert('success', 'Lokasi GPS berhasil dideteksi!');
+                },
+                function(err) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)';
+                    const msgs = {
+                        1: 'Akses lokasi ditolak. Izinkan akses lokasi di browser.',
+                        2: 'Lokasi tidak tersedia. Coba klik langsung di peta.',
+                        3: 'Timeout saat mendapatkan lokasi. Coba lagi.'
+                    };
+                    showAlert('error', msgs[err.code] || 'Gagal mendapatkan lokasi GPS.');
+                },
+                { timeout: 10000, enableHighAccuracy: true }
+            );
+        }
+
+        // =============================================
+        // RESET MAP
+        // =============================================
+        function resetMap() {
+            if (marker) { map.removeLayer(marker); marker = null; }
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+            document.getElementById('latDisplay').textContent = '-';
+            document.getElementById('lngDisplay').textContent = '-';
+            document.getElementById('mapCoordsDisplay').classList.remove('visible');
+            document.getElementById('map').classList.remove('map-selected');
+            document.getElementById('resetMapBtn').style.display = 'none';
+            document.getElementById('mapTooltip').style.display = 'flex';
+            map.setView(SURABAYA, 13);
+        }
+
+        // =============================================
+        // FORM SUBMIT — dengan validasi koordinat
+        // =============================================
+        document.getElementById('laporanForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const lat = document.getElementById('latitude').value;
+            const lng = document.getElementById('longitude').value;
+
+            // Wajib pilih lokasi di peta
+            if (!lat || !lng) {
+                showAlert('error', 'Mohon pilih lokasi di peta terlebih dahulu!');
+                document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById('map').style.borderColor = 'var(--danger)';
+                setTimeout(() => { document.getElementById('map').style.borderColor = ''; }, 3000);
+                return;
+            }
+
+            const judul_laporan       = document.getElementById('judul_laporan').value.trim();
+            const lokasi_jalan        = document.getElementById('lokasi_jalan').value.trim();
+            const kecamatan           = document.getElementById('kecamatan').value;
+            const deskripsi_kerusakan = document.getElementById('deskripsi_kerusakan').value.trim();
+            const tingkat_kerusakan   = document.getElementById('tingkat_kerusakan').value;
+            const fotoInput           = document.getElementById('foto');
+
+            if (!judul_laporan || !lokasi_jalan || !kecamatan || !deskripsi_kerusakan || !tingkat_kerusakan) {
+                showAlert('error', 'Semua field bertanda * wajib diisi');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('judul_laporan', judul_laporan);
+                formData.append('lokasi_jalan', lokasi_jalan);
+                formData.append('kecamatan', kecamatan);
+                formData.append('deskripsi_kerusakan', deskripsi_kerusakan);
+                formData.append('tingkat_kerusakan', tingkat_kerusakan);
+                formData.append('latitude', lat);
+                formData.append('longitude', lng);
+                if (fotoInput.files.length > 0) formData.append('foto', fotoInput.files[0]);
+
+                const response = await fetch('api.php?action=add_laporan', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('success', 'Laporan berhasil dikirim!');
+                    // Reset form & map
+                    e.target.reset();
+                    resetMap();
+                    document.getElementById('preview-image').style.display = 'none';
+                    document.getElementById('uploadArea').style.display = 'block';
+                    const removeBtn = document.getElementById('removePhotoBtn');
+                    if (removeBtn) removeBtn.remove();
+
+                    setTimeout(() => { window.location.href = 'daftar-laporan.html'; }, 1500);
+                } else {
+                    showAlert('error', data.message || 'Gagal mengirim laporan');
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Laporan';
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Laporan';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // =============================================
+        // PHOTO UPLOAD (dari kode lama — lebih lengkap)
+        // =============================================
+        function initPhotoUpload() {
+            const uploadArea   = document.getElementById('uploadArea');
+            const fileInput    = document.getElementById('foto');
+            const previewImage = document.getElementById('preview-image');
+
+            if (!uploadArea || !fileInput || !previewImage) return;
+
+            // Klik area upload
+            uploadArea.addEventListener('click', function(e) {
+                e.preventDefault();
+                fileInput.click();
+            });
+
+            // Pilih file dari dialog
+            fileInput.addEventListener('change', function() {
+                handleFileSelect(this.files);
+            });
+
+            // Drag over
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#00DD00';
+                this.style.backgroundColor = 'rgba(0, 221, 0, 0.05)';
+            });
+
+            // Drag leave
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#e9ecef';
+                this.style.backgroundColor = '';
+            });
+
+            // Drop
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#e9ecef';
+                this.style.backgroundColor = '';
+                handleFileSelect(e.dataTransfer.files);
+            });
+
+            function handleFileSelect(files) {
+                if (!files || files.length === 0) return;
+
+                const file = files[0];
+
+                // Validasi tipe file
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    showAlert('error', 'Format file tidak didukung! Gunakan JPG, PNG, atau GIF.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Validasi ukuran (maks 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert('error', 'Ukuran file maksimal 5MB!');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Tampilkan preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    uploadArea.style.display = 'none';
+
+                    // Tombol hapus foto
+                    if (!document.getElementById('removePhotoBtn')) {
+                        const removeBtn = document.createElement('button');
+                        removeBtn.id        = 'removePhotoBtn';
+                        removeBtn.type      = 'button';
+                        removeBtn.className = 'btn btn-danger btn-small';
+                        removeBtn.style.marginTop = '10px';
+                        removeBtn.innerHTML = '<i class="fas fa-times"></i> Hapus Foto';
+                        removeBtn.onclick = function() {
+                            previewImage.src            = '';
+                            previewImage.style.display  = 'none';
+                            uploadArea.style.display    = 'block';
+                            fileInput.value             = '';
+                            this.remove();
+                        };
+                        previewImage.parentNode.insertBefore(removeBtn, previewImage.nextSibling);
+                    }
+                };
+                reader.onerror = function() {
+                    showAlert('error', 'Gagal membaca file!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // =============================================
+        // INIT SAAT HALAMAN LOADED
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            initPhotoUpload();
+        });
+    </script>
+</body>
+</html>

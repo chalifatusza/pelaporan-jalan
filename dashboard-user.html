@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard User - Pantau Jalan Surabaya</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Pengguna</div>
+                        <div class="user-role">Pengguna</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                    <a href="index.html" class="btn btn-outline" style="margin-left: 10px;">Beranda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-user.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="laporan-baru.html"><i class="fas fa-plus-circle"></i> Buat Laporan</a></li>
+                        <li><a href="daftar-laporan.html"><i class="fas fa-list"></i> Laporan Saya</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+                </div>
+                
+                <div class="dashboard-content">
+                    <h1 class="dashboard-title">Dashboard User</h1>
+                    <p class="greeting">Halo, Pengguna</p>
+                    
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-road-circle-exclamation"></i>
+                            </div>
+                            <div class="stat-number" id="total-laporan">0</div>
+                            <div class="stat-label">Total Laporan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="stat-number" id="laporan-diproses">0</div>
+                            <div class="stat-label">Dalam Proses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-road-circle-check"></i>
+                            </div>
+                            <div class="stat-number" id="laporan-selesai">0</div>
+                            <div class="stat-label">Selesai</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="stat-number" id="laporan-bulan-ini">0</div>
+                            <div class="stat-label">Bulan Ini</div>
+                        </div>
+                    </div>
+                    
+                    <h2 style="margin-bottom: 20px;">Laporan Terbaru Anda</h2>
+                    <div class="table-responsive">
+                        <table class="table" id="laporanTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">ID</th>
+                                    <th>Judul</th>
+                                    <th>Lokasi</th>
+                                    <th>Kecamatan</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                    <th>Kerusakan</th>
+                                    <th style="width: 100px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 30px; display: flex; justify-content: space-between;">
+                        <a href="laporan-baru.html" class="btn btn-primary">Buat Laporan Baru</a>
+                        <a href="daftar-laporan.html" class="btn btn-outline">Lihat Semua Laporan</a>
+                    </div>
+                    
+                    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h3><i class="fas fa-lightbulb"></i> Tips Pelaporan yang Efektif</h3>
+                        <ul style="margin-top: 10px;">
+                            <li>Ambil foto dengan jelas yang menunjukkan kerusakan jalan</li>
+                            <li>Berikan deskripsi yang detail tentang lokasi kerusakan</li>
+                            <li>Tentukan tingkat kerusakan dengan tepat</li>
+                            <li>Periksa status laporan Anda secara berkala</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Load user-specific stats
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserStats();
+        });
+        
+        async function loadUserStats() {
+            try {
+                const response = await fetch('api.php?action=get_laporan');
+                const data = await response.json();
+                
+                if (data.success && data.data.laporan) {
+                    const laporan = data.data.laporan;
+                    
+                    // Calculate stats
+                    const totalLaporan = laporan.length;
+                    const diproses = laporan.filter(l => l.status === 'diproses').length;
+                    const selesai = laporan.filter(l => l.status === 'selesai').length;
+                    
+                    // Get current month reports
+                    const currentMonth = new Date().getMonth();
+                    const currentYear = new Date().getFullYear();
+                    const bulanIni = laporan.filter(l => {
+                        const reportDate = new Date(l.tanggal_laporan);
+                        return reportDate.getMonth() === currentMonth && 
+                               reportDate.getFullYear() === currentYear;
+                    }).length;
+                    
+                    // Update stats
+                    document.getElementById('total-laporan').textContent = totalLaporan;
+                    document.getElementById('laporan-diproses').textContent = diproses;
+                    document.getElementById('laporan-selesai').textContent = selesai;
+                    document.getElementById('laporan-bulan-ini').textContent = bulanIni;
+                    
+                    // Animate counters
+                    animateUserCounters();
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+        
+        function animateUserCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = +counter.textContent;
+                const increment = target / 50;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, 30);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+
+        
+    </script>
+</body>
+</html>

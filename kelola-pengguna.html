@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pengguna - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+        .stat-mini {
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-mini .num {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .stat-mini .lbl {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+        .avatar-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .name-cell { display: flex; align-items: center; }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 28px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal-box h3 { margin-top: 0; color: var(--dark); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .role-select {
+            padding: 5px 10px;
+            border: 1px solid var(--gray-light);
+            border-radius: 6px;
+            font-family: Poppins, sans-serif;
+            font-size: 0.82rem;
+            cursor: pointer;
+            background: white;
+        }
+        .toast-notif {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 9999;
+        }
+        .toast-notif.show { transform: translateY(0); opacity: 1; }
+        @media(max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .table-responsive { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-road"></i>
+                    <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info-text">
+                        <div class="user-name">Administrator</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <button class="btn btn-outline logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- SIDEBAR -->
+                <div class="dashboard-sidebar">
+                    <h3 style="margin-bottom: 20px;">Menu Admin</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="dashboard-admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="daftar-laporan-admin.html"><i class="fas fa-list"></i> Semua Laporan</a></li>
+                        <li><a href="peta-laporan.html"><i class="fas fa-map-marked-alt"></i> Peta Laporan</a></li>
+                        <li><a href="kelola-pengguna.html" class="active"><i class="fas fa-users-cog"></i> Kelola Pengguna</a></li>
+                        <li><a href="edit-profil.html"><i class="fas fa-user-edit"></i> Edit Profil</a></li>
+                        <li><a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a></li>
+                    </ul>
+
+                    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                        <h4>Ringkasan</h4>
+                        <div style="margin-top: 10px;">
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Total: <span id="sidebar-total">0</span></p>
+                            <p style="font-size: 0.9rem; margin: 5px 0;">Admin: <span id="sidebar-admin">0</span></p>
+                            <p style="font-size: 0.9rem; margin: 5px 0;">User: <span id="sidebar-user">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT -->
+                <div class="dashboard-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div>
+                            <h1 class="dashboard-title">Kelola Pengguna</h1>
+                            <p>Manajemen pengguna sistem pelaporan</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats-row">
+                        <div class="stat-mini">
+                            <div class="num" id="stat-total">0</div>
+                            <div class="lbl">Total Pengguna</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="num" id="stat-admin">0</div>
+                            <div class="lbl">Admin</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="num" id="stat-user">0</div>
+                            <div class="lbl">User Biasa</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="num" id="stat-baru">0</div>
+                            <div class="lbl">Daftar Bulan Ini</div>
+                        </div>
+                    </div>
+
+                    <!-- Filter -->
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="searchUsers" class="form-control"
+                               placeholder="Cari username, nama, atau email..."
+                               style="flex: 1; min-width: 200px;">
+                        <select id="filterRole" class="form-control" style="width: 180px;">
+                            <option value="">Semua Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama / Username</th>
+                                    <th>Email</th>
+                                    <th>No. Telp</th>
+                                    <th>Role</th>
+                                    <th>Bergabung</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" style="text-align:center;padding:40px;color:var(--gray);">
+                                        <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Warning Box -->
+                    <div style="margin-top: 30px; padding: 20px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <h3 style="color: #856404; margin-bottom: 10px;">
+                            <i class="fas fa-exclamation-triangle"></i> Peringatan
+                        </h3>
+                        <ul style="color: #856404; margin-left: 20px; line-height: 1.8;">
+                            <li>Akun admin tidak dapat dihapus atau diubah rolenya</li>
+                            <li>Menghapus pengguna <strong>tidak</strong> menghapus laporan miliknya</li>
+                            <li>Pastikan sudah backup data sebelum menghapus pengguna</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#dc3545;margin-right:8px;"></i>Hapus Pengguna</h3>
+            <p style="color: var(--gray);">
+                Yakin ingin menghapus pengguna <strong id="deleteTargetName"></strong>?
+                Akun tidak bisa dipulihkan.
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-notif" id="toastNotif"></div>
+
+    <script src="app.js"></script>
+    <script>
+        let allUsers      = [];
+        let deleteTargetId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUsersData();
+            document.getElementById('searchUsers').addEventListener('input', filterUsers);
+            document.getElementById('filterRole').addEventListener('change', filterUsers);
+            document.getElementById('deleteModal').addEventListener('click', function (e) {
+                if (e.target === this) closeDeleteModal();
+            });
+        });
+
+        async function loadUsersData() {
+            try {
+                const res  = await fetch('api.php?action=get_users');
+                const json = await res.json();
+                if (json.success && json.data) {
+                    allUsers = json.data;
+                    updateStats();
+                    displayUsers(allUsers);
+                }
+            } catch (e) {
+                console.error('Error loading users:', e);
+            }
+        }
+
+        function updateStats() {
+            const now   = new Date();
+            const bulan = now.getMonth();
+            const tahun = now.getFullYear();
+            const admins = allUsers.filter(u => u.role === 'admin').length;
+            const users  = allUsers.filter(u => u.role === 'user').length;
+            const baru   = allUsers.filter(u => {
+                const d = new Date(u.created_at);
+                return d.getMonth() === bulan && d.getFullYear() === tahun;
+            }).length;
+
+            document.getElementById('stat-total').textContent  = allUsers.length;
+            document.getElementById('stat-admin').textContent  = admins;
+            document.getElementById('stat-user').textContent   = users;
+            document.getElementById('stat-baru').textContent   = baru;
+            document.getElementById('sidebar-total').textContent = allUsers.length;
+            document.getElementById('sidebar-admin').textContent = admins;
+            document.getElementById('sidebar-user').textContent  = users;
+        }
+
+        function displayUsers(users) {
+            const tbody = document.querySelector('#usersTable tbody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray);">Tidak ada pengguna ditemukan</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(u => {
+                const inisial = (u.nama_lengkap || u.username || '?')[0].toUpperCase();
+                const tgl     = new Date(u.created_at).toLocaleDateString('id-ID', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                const isAdmin = u.role === 'admin';
+                return `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td>
+                            <div class="name-cell">
+                                <span class="avatar-circle">${inisial}</span>
+                                <div>
+                                    <div style="font-weight:600;">${u.nama_lengkap || '-'}</div>
+                                    <div style="font-size:0.78rem;color:var(--gray);">@${u.username}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${u.email || '-'}</td>
+                        <td>${u.no_telp || '-'}</td>
+                        <td>
+                            <span class="status-badge ${isAdmin ? 'status-selesai' : 'status-diproses'}">
+                                ${u.role}
+                            </span>
+                        </td>
+                        <td style="font-size:0.85rem;color:var(--gray);">${tgl}</td>
+                        <td>
+                            ${isAdmin
+                                ? `<span style="color:var(--gray);font-size:0.85rem;"><i class="fas fa-shield-alt"></i> Protected</span>`
+                                : `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                    <select class="role-select" onchange="gantiRole(${u.id}, this.value)">
+                                        <option value="user"  ${u.role === 'user'  ? 'selected' : ''}>User</option>
+                                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                    </select>
+                                    <button class="btn btn-danger btn-small" onclick="hapusUser(${u.id}, '${u.nama_lengkap}')">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                   </div>`
+                            }
+                        </td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function filterUsers() {
+            const q    = document.getElementById('searchUsers').value.toLowerCase();
+            const role = document.getElementById('filterRole').value;
+            const filtered = allUsers.filter(u => {
+                const matchSearch = !q || [u.nama_lengkap, u.username, u.email]
+                    .some(v => v?.toLowerCase().includes(q));
+                return matchSearch && (!role || u.role === role);
+            });
+            displayUsers(filtered);
+        }
+
+        async function gantiRole(id, role) {
+            try {
+                const fd = new FormData();
+                fd.append('action', 'update_role');
+                fd.append('id', id);
+                fd.append('role', role);
+                const res  = await fetch('api.php', { method: 'POST', body: fd });
+                const json = await res.json();
+                showToast(json.success ? '✅ Role berhasil diperbarui' : '❌ Gagal update role');
+                if (json.success) loadUsersData();
+            } catch (e) {
+                showToast('❌ Terjadi kesalahan');
+            }
+        }
+
+        function hapusUser(id, nama) {
+            deleteTargetId = id;
+            document.getElementById('deleteTargetName').textContent = nama;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        async function confirmDelete() {
+            try {
+                const fd = new FormData();
+                fd.append('action', 'delete_user');
+                fd.append('id', deleteTargetId);
+                const res  = await fetch('api.php', { method: 'POST', body: fd });
+                const json = await res.json();
+                closeDeleteModal();
+                showToast(json.success && json.affected > 0
+                    ? '✅ Pengguna berhasil dihapus'
+                    : '❌ Gagal menghapus pengguna');
+                if (json.success) loadUsersData();
+            } catch (e) {
+                showToast('❌ Terjadi kesalahan');
+                closeDeleteModal();
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toastNotif');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Expose untuk app.js compatibility
+        window.loadAllUsers = loadUsersData;
+    </script>
+</body>
+</html>
