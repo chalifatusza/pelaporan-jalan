@@ -88,7 +88,7 @@
             const isAdmin = laporan.role === 'admin';
             
             const html = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div class="dashboard-content-header">
                     <div>
                         <h1 class="dashboard-title">Detail Laporan</h1>
                         <p>ID: #${laporan.id} • ${formatDate(laporan.tanggal_laporan_formatted)}</p>
@@ -108,7 +108,7 @@
                         <h2 style="margin: 0; color: white;">${laporan.judul_laporan}</h2>
                     </div>
                     <div class="card-body">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                        <div class="grid-row-2" style="margin-bottom: 30px;">
                             <div>
                                 <h3><i class="fas fa-info-circle"></i> Informasi Laporan</h3>
                                 <table style="width: 100%; margin-top: 15px;">
@@ -203,7 +203,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer" style="display: flex; justify-content: space-between;">
+                    <div class="card-footer">
                         <div>
                             <button class="btn btn-outline" onclick="window.history.back()">
                                 <i class="fas fa-arrow-left"></i> Kembali
