@@ -8,12 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 24px;
-        }
         .stat-mini {
             background: white;
             padding: 15px;
@@ -90,10 +84,6 @@
             z-index: 9999;
         }
         .toast-notif.show { transform: translateY(0); opacity: 1; }
-        @media(max-width: 768px) {
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .table-responsive { overflow-x: auto; }
-        }
     </style>
 </head>
 <body>

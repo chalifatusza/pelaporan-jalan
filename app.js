@@ -1,3 +1,228 @@
+// ==================== API INTERCEPTOR ====================
+(function() {
+    let API_BASE_URL = localStorage.getItem('API_BASE_URL') || 'http://localhost:8000/api';
+
+    const originalFetch = window.fetch;
+
+    window.fetch = async function(resource, init) {
+        if (typeof resource === 'string' && (resource.includes('api.php') || resource === 'api.php')) {
+            const urlObj = new URL(resource, window.location.origin);
+            const action = urlObj.searchParams.get('action') || '';
+            const id = urlObj.searchParams.get('id') || '';
+            const page = urlObj.searchParams.get('page') || '';
+            const statusFilter = urlObj.searchParams.get('status') || '';
+            const tingkatFilter = urlObj.searchParams.get('tingkat_kerusakan') || '';
+            const kecamatanFilter = urlObj.searchParams.get('kecamatan') || '';
+            const rangeFilter = urlObj.searchParams.get('range') || '';
+            const searchFilter = urlObj.searchParams.get('search') || '';
+
+            let method = (init && init.method) ? init.method.toUpperCase() : 'GET';
+            let path = '';
+            let isFormData = false;
+
+            switch (action) {
+                case 'login':
+                    path = '/login';
+                    method = 'POST';
+                    break;
+                case 'register':
+                    path = '/register';
+                    method = 'POST';
+                    break;
+                case 'logout':
+                    path = '/logout';
+                    method = 'POST';
+                    break;
+                case 'check_session':
+                case 'get_profile':
+                    path = '/user';
+                    method = 'GET';
+                    break;
+                case 'update_profile':
+                    path = '/user';
+                    method = 'PUT';
+                    break;
+                case 'add_laporan':
+                    path = '/laporan';
+                    method = 'POST';
+                    break;
+                case 'get_laporan':
+                    path = '/laporan';
+                    method = 'GET';
+                    break;
+                case 'get_laporan_by_id':
+                    path = `/laporan/${id}`;
+                    method = 'GET';
+                    break;
+                case 'update_laporan':
+                    path = `/laporan/${id || ''}`;
+                    method = 'POST';
+                    break;
+                case 'delete_laporan':
+                    path = `/laporan/${id || ''}`;
+                    method = 'DELETE';
+                    break;
+                case 'get_stats':
+                    path = '/stats';
+                    method = 'GET';
+                    break;
+                case 'get_user_stats':
+                    path = '/stats/user';
+                    method = 'GET';
+                    break;
+                case 'get_all_users':
+                case 'get_users':
+                    path = '/admin/users';
+                    method = 'GET';
+                    break;
+                case 'update_user_role':
+                case 'update_role':
+                    path = `/admin/users/${id || ''}/role`;
+                    method = 'PUT';
+                    break;
+                case 'delete_user':
+                    path = `/admin/users/${id || ''}`;
+                    method = 'DELETE';
+                    break;
+                case 'get_laporan_admin':
+                    let adminParams = [];
+                    if (page) adminParams.push(`page=${page}`);
+                    if (statusFilter) adminParams.push(`status=${statusFilter}`);
+                    if (tingkatFilter) adminParams.push(`tingkat_kerusakan=${tingkatFilter}`);
+                    if (kecamatanFilter) adminParams.push(`kecamatan=${kecamatanFilter}`);
+                    if (rangeFilter) adminParams.push(`range=${rangeFilter}`);
+                    if (searchFilter) adminParams.push(`search=${searchFilter}`);
+                    path = '/admin/laporan' + (adminParams.length ? '?' + adminParams.join('&') : '');
+                    method = 'GET';
+                    break;
+                case 'update_status':
+                    path = `/admin/laporan/${id || ''}/status`;
+                    method = 'PUT';
+                    break;
+                case 'get_all_laporan_map':
+                    path = '/laporan-map';
+                    method = 'GET';
+                    break;
+                case 'get_status_stats_filtered':
+                    path = `/stats/status?range=${rangeFilter}`;
+                    method = 'GET';
+                    break;
+                case 'get_kerusakan_stats_filtered':
+                    path = `/stats/kerusakan?range=${rangeFilter}`;
+                    method = 'GET';
+                    break;
+                case 'get_kecamatan_stats_filtered':
+                    path = `/stats/kecamatan?range=${rangeFilter}`;
+                    method = 'GET';
+                    break;
+                case 'check_gd':
+                    return new Response(JSON.stringify({ success: true, data: { gd_available: true } }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                default:
+                    path = '/laporan';
+                    break;
+            }
+
+            let body = init ? init.body : null;
+            if (body instanceof FormData) {
+                isFormData = true;
+                if (!id) {
+                    const formId = body.get('id') || body.get('laporan_id') || body.get('user_id');
+                    if (formId) {
+                        if (action === 'update_laporan' || action === 'delete_laporan') {
+                            path = `/laporan/${formId}`;
+                        } else if (action === 'update_status') {
+                            path = `/admin/laporan/${formId}/status`;
+                        } else if (action === 'update_user_role' || action === 'update_role' || action === 'delete_user') {
+                            path = `/admin/users/${formId}/role`;
+                            if (action === 'delete_user') {
+                                path = `/admin/users/${formId}`;
+                            }
+                        }
+                    }
+                }
+
+                if (method === 'PUT' || action === 'update_profile') {
+                    body.append('_method', 'PUT');
+                    method = 'POST';
+                }
+            }
+
+            const newUrl = `${API_BASE_URL}${path}`;
+            const token = localStorage.getItem('auth_token');
+            const headers = new Headers(init ? init.headers : {});
+            
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            headers.set('Accept', 'application/json');
+
+            const newInit = {
+                ...init,
+                method,
+                headers,
+            };
+
+            if (newInit.credentials) {
+                delete newInit.credentials;
+            }
+
+            if (body) {
+                newInit.body = body;
+            }
+
+            try {
+                const res = await originalFetch(newUrl, newInit);
+                
+                if (res.status === 401) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    const currentPageName = window.location.pathname.split('/').pop();
+                    if (currentPageName !== 'login.html' && currentPageName !== 'index.html' && currentPageName !== 'register.html') {
+                        window.location.href = 'login.html';
+                    }
+                }
+
+                const text = await res.text();
+                let json;
+                try {
+                    json = JSON.parse(text);
+                } catch (e) {
+                    return new Response(text, {
+                        status: res.status,
+                        statusText: res.statusText,
+                        headers: res.headers
+                    });
+                }
+
+                if (json.success && json.data && json.data.token) {
+                    localStorage.setItem('auth_token', json.data.token);
+                    localStorage.setItem('user_role', json.data.user.role);
+                }
+
+                if (action === 'logout' && json.success) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                }
+
+                return new Response(JSON.stringify(json), {
+                    status: res.status,
+                    statusText: res.statusText,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+            } catch (err) {
+                console.error('API Fetch Interceptor error:', err);
+                throw err;
+            }
+        }
+
+        return originalFetch(resource, init);
+    };
+})();
+// ==================== END API INTERCEPTOR ====================
+
 let currentUser = null;
 let allLaporanData = [];
 let currentPage = 1;
@@ -59,7 +284,9 @@ function checkLoginStatus() {
         'edit-laporan.html', 
         'daftar-laporan.html', 
         'daftar-laporan-admin.html',
-        'kelola-pengguna.html'
+        'kelola-pengguna.html',
+        'peta-laporan.html',
+        'detail-laporan.html'
     ];
     
     // Only check for protected pages
@@ -136,6 +363,12 @@ function applyRoleSidebar(role) {
     
     const page = window.location.pathname.split('/').pop();
     
+    // Dynamically update sidebar title text based on role
+    const sidebarTitle = document.querySelector('.dashboard-sidebar h3');
+    if (sidebarTitle) {
+        sidebarTitle.textContent = role === 'admin' ? 'Menu Admin' : 'Menu';
+    }
+    
     if (role === 'admin') {
         sidebarMenu.innerHTML = `
             <li><a href="dashboard-admin.html" class="${page === 'dashboard-admin.html' ? 'active' : ''}">
@@ -143,6 +376,9 @@ function applyRoleSidebar(role) {
             </a></li>
             <li><a href="daftar-laporan-admin.html" class="${page === 'daftar-laporan-admin.html' ? 'active' : ''}">
                 <i class="fas fa-list"></i> Semua Laporan
+            </a></li>
+            <li><a href="peta-laporan.html" class="${page === 'peta-laporan.html' ? 'active' : ''}">
+                <i class="fas fa-map-marked-alt"></i> Peta Laporan
             </a></li>
             <li><a href="kelola-pengguna.html" class="${page === 'kelola-pengguna.html' ? 'active' : ''}">
                 <i class="fas fa-users-cog"></i> Kelola Pengguna
@@ -164,6 +400,9 @@ function applyRoleSidebar(role) {
             </a></li>
             <li><a href="daftar-laporan.html" class="${page === 'daftar-laporan.html' ? 'active' : ''}">
                 <i class="fas fa-list"></i> Laporan Saya
+            </a></li>
+            <li><a href="peta-laporan.html" class="${page === 'peta-laporan.html' ? 'active' : ''}">
+                <i class="fas fa-map-marked-alt"></i> Peta Laporan
             </a></li>
             <li><a href="edit-profil.html" class="${page.includes('edit-profil') ? 'active' : ''}">
                 <i class="fas fa-user-edit"></i> Edit Profil
