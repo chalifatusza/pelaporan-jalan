@@ -18,7 +18,11 @@ class ApiAuthenticate
     public function handle(Request $request, Closure $next): Response
     {
         // 1. Check Bearer Token (JWT)
-        $authHeader = $request->header('Authorization');
+        $authHeader = $request->header('Authorization')
+            ?: $request->header('X-Authorization')
+            ?: ($request->header('X-Auth-Token') ? 'Bearer ' . $request->header('X-Auth-Token') : null)
+            ?: ($request->query('token') ? 'Bearer ' . $request->query('token') : null);
+
         if ($authHeader && preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
             $jwt = $matches[1];
             $decoded = JWTService::decodeToken($jwt);

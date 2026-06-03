@@ -261,7 +261,8 @@ class AuthController extends Controller
         $clientSecret = env('GOOGLE_CLIENT_SECRET');
 
         if (!empty($clientId) && !empty($clientSecret)) {
-            $redirectUri = url('/api/auth/google/callback');
+            $isLocal = str_contains($request->getHost(), 'localhost') || str_contains($request->getHost(), '127.0.0.1');
+            $redirectUri = url('/api/auth/google/callback', [], !$isLocal);
             $query = http_build_query([
                 'client_id' => $clientId,
                 'redirect_uri' => $redirectUri,
@@ -342,7 +343,8 @@ class AuthController extends Controller
         $clientSecret = env('GOOGLE_CLIENT_SECRET');
 
         if (!empty($clientId) && !empty($clientSecret) && $code !== 'mock_code') {
-            $redirectUri = url('/api/auth/google/callback');
+            $isLocal = str_contains($request->getHost(), 'localhost') || str_contains($request->getHost(), '127.0.0.1');
+            $redirectUri = url('/api/auth/google/callback', [], !$isLocal);
             
             $response = Http::post('https://oauth2.googleapis.com/token', [
                 'client_id' => $clientId,
@@ -446,7 +448,8 @@ class AuthController extends Controller
         }
 
         if (!empty($clientId) && !empty($clientSecret)) {
-            $redirectUri = url('/api/auth/github/callback');
+            $isLocal = str_contains($request->getHost(), 'localhost') || str_contains($request->getHost(), '127.0.0.1');
+            $redirectUri = url('/api/auth/github/callback', [], !$isLocal);
             $query = http_build_query([
                 'client_id' => $clientId,
                 'redirect_uri' => $redirectUri,
@@ -516,7 +519,8 @@ class AuthController extends Controller
         }
 
         if (!empty($clientId) && !empty($clientSecret) && $code !== 'mock_code') {
-            $redirectUri = url('/api/auth/github/callback');
+            $isLocal = str_contains($request->getHost(), 'localhost') || str_contains($request->getHost(), '127.0.0.1');
+            $redirectUri = url('/api/auth/github/callback', [], !$isLocal);
 
             $response = Http::withHeaders([
                 'Accept' => 'application/json',

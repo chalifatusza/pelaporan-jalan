@@ -159,6 +159,8 @@
             
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`);
+                headers.set('X-Authorization', `Bearer ${token}`);
+                headers.set('X-Auth-Token', token);
             }
             headers.set('Accept', 'application/json');
 
