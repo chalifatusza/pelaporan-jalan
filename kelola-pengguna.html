@@ -263,7 +263,7 @@
             const admins = allUsers.filter(u => u.role === 'admin').length;
             const users  = allUsers.filter(u => u.role === 'user').length;
             const baru   = allUsers.filter(u => {
-                const d = new Date(u.created_at);
+                const d = new Date(u.tanggal_daftar || u.created_at);
                 return d.getMonth() === bulan && d.getFullYear() === tahun;
             }).length;
 
@@ -284,7 +284,7 @@
             }
             tbody.innerHTML = users.map(u => {
                 const inisial = (u.nama_lengkap || u.username || '?')[0].toUpperCase();
-                const tgl     = new Date(u.created_at).toLocaleDateString('id-ID', {
+                const tgl     = new Date(u.tanggal_daftar || u.created_at).toLocaleDateString('id-ID', {
                     day: '2-digit', month: 'short', year: 'numeric'
                 });
                 const isAdmin = u.role === 'admin';
@@ -301,7 +301,7 @@
                             </div>
                         </td>
                         <td>${u.email || '-'}</td>
-                        <td>${u.no_telp || '-'}</td>
+                        <td>${u.no_telepon || u.no_telp || '-'}</td>
                         <td>
                             <span class="status-badge ${isAdmin ? 'status-selesai' : 'status-diproses'}">
                                 ${u.role}

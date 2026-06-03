@@ -170,7 +170,7 @@
 
                     <!-- Filter Status -->
                     <div class="peta-controls">
-                        <span style="font-size:0.85rem;font-weight:600;color:var(--gray);">Filter Status:</span>
+                        <span style="font-size:0.85rem;font-weight:600;color:var(--gray); min-width: 100px;">Filter Status:</span>
                         <button class="filter-pill active-all" onclick="filterMap('all', this)" data-filter="all">
                             <i class="fas fa-globe"></i> Semua
                         </button>
@@ -183,8 +183,10 @@
                         <button class="filter-pill" onclick="filterMap('selesai', this)" data-filter="selesai">
                             <i class="fas fa-check-circle"></i> Selesai
                         </button>
+                    </div>
 
-                        <span style="font-size:0.85rem;font-weight:600;color:var(--gray);margin-left:10px;">Kerusakan:</span>
+                    <div class="peta-controls" style="margin-top: 10px; margin-bottom: 20px;">
+                        <span style="font-size:0.85rem;font-weight:600;color:var(--gray); min-width: 100px;">Kerusakan:</span>
                         <button class="filter-pill" onclick="filterMap('ringan', this)" data-filter="ringan">
                             <span style="color:var(--primary);">●</span> Ringan
                         </button>

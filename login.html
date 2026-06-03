@@ -32,16 +32,16 @@
                 <h1 class="form-title">Masuk ke Akun Anda</h1>
                 <p class="text-center" style="margin-bottom: 30px;">Belum punya akun? <a href="register.html" class="text-primary">Daftar disini</a></p>
                 
-                <form id="loginForm">
+                <form id="loginForm" autocomplete="off">
                     <div class="form-group">
                         <label for="username" class="form-label">Username</label> 
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" required>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" autocomplete="new-username" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="password" class="form-label">Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan password" required>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan password" autocomplete="new-password" required>
                             <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
                                 <i class="fas fa-eye"></i>
                             </button>

@@ -263,46 +263,10 @@ async function checkLoginStatusForHomepage() {
         const step1Buttons = document.getElementById('step1Buttons');
         
         if (data.success) {
-            // User is logged in
+            // User is logged in - redirect to dashboard directly
             const user = data.data.user;
-            
-            // Update navbar
-            dashboardLink.style.display = 'block';
-            dashboardLinkAnchor.href = user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html';
-            dashboardLinkAnchor.textContent = user.role === 'admin' ? 'Dashboard Admin' : 'Dashboard Saya';
-            
-            // Update navbar buttons
-            authButtons.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="text-align: right;">
-                        <div style="font-weight: 500; font-size: 0.9rem;">Halo,</div>
-                        <div style="font-weight: 600;">${user.nama}</div>
-                    </div>
-                    <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-primary">Dashboard</a>
-                    <button class="btn btn-outline logout-btn-homepage">Logout</button>
-                </div>
-            `;
-            
-            // Update hero buttons
-            heroAuthButtons.innerHTML = `
-                <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-primary btn-large">Buka Dashboard</a>
-                ${user.role === 'user' ? '<a href="laporan-baru.html" class="btn btn-outline btn-large">Buat Laporan Baru</a>' : ''}
-            `;
-            
-            // Hide login/register section
-            if (authSection) authSection.style.display = 'none';
-            
-            // Update step 1 buttons
-            if (step1Buttons) {
-                step1Buttons.innerHTML = `
-                    <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-outline btn-small" style="margin-top: 10px;">Dashboard Saya</a>
-                `;
-            }
-            
-            // Add logout functionality
-            document.querySelectorAll('.logout-btn-homepage').forEach(btn => {
-                btn.addEventListener('click', logout);
-            });
+            window.location.href = user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html';
+            return;
         } else {
             // User is not logged in
             showDefaultGuestView();

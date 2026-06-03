@@ -437,6 +437,19 @@ function initializeForms() {
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
+        // Clear username & password inputs on load to prevent auto-fill
+        const uInput = document.getElementById('username');
+        const pInput = document.getElementById('password');
+        if (uInput) uInput.value = '';
+        if (pInput) pInput.value = '';
+        setTimeout(() => {
+            if (uInput) uInput.value = '';
+            if (pInput) pInput.value = '';
+        }, 100);
+        setTimeout(() => {
+            if (uInput) uInput.value = '';
+            if (pInput) pInput.value = '';
+        }, 500);
     }
     
     // Register form
