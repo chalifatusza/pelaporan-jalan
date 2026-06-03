@@ -21,9 +21,10 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-$request = Request::capture();
 if (isset($_SERVER['VERCEL']) || env('VERCEL') || isset($_ENV['VERCEL'])) {
-    $request->setBaseUrl('');
+    $_SERVER['SCRIPT_NAME'] = '/index.php';
+    $_SERVER['PHP_SELF'] = '/index.php';
+    $_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
 }
 
-$app->handleRequest($request);
+$app->handleRequest(Request::capture());
