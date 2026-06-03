@@ -185,7 +185,7 @@
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
                     const currentPageName = window.location.pathname.split('/').pop();
-                    if (currentPageName !== 'login.html' && currentPageName !== 'index.html' && currentPageName !== 'register.html') {
+                    if (currentPageName !== '' && currentPageName !== 'index.html' && currentPageName !== 'login.html' && currentPageName !== 'register.html') {
                         window.location.href = 'login.html';
                     }
                 }
