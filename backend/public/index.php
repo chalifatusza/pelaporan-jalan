@@ -21,4 +21,9 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-$app->handleRequest(Request::capture());
+$request = Request::capture();
+if (isset($_SERVER['VERCEL']) || env('VERCEL') || isset($_ENV['VERCEL'])) {
+    $request->setBaseUrl('');
+}
+
+$app->handleRequest($request);
