@@ -190,6 +190,14 @@
                             <div class="form-text">Jelaskan jenis kerusakan, ukuran, dan potensi bahaya yang ditimbulkan</div>
                         </div>
 
+                        <!-- Kategori -->
+                        <div class="form-group">
+                            <label for="kategori_id" class="form-label">Kategori Kerusakan *</label>
+                            <select id="kategori_id" class="form-control" required>
+                                <option value="">Memuat kategori...</option>
+                            </select>
+                        </div>
+
                         <!-- Tingkat Kerusakan -->
                         <div class="form-group">
                             <label for="tingkat_kerusakan" class="form-label">Tingkat Kerusakan *</label>
@@ -374,6 +382,7 @@
                 return;
             }
 
+            const kategori_id         = document.getElementById('kategori_id').value;
             const judul_laporan       = document.getElementById('judul_laporan').value.trim();
             const lokasi_jalan        = document.getElementById('lokasi_jalan').value.trim();
             const kecamatan           = document.getElementById('kecamatan').value;
@@ -381,7 +390,7 @@
             const tingkat_kerusakan   = document.getElementById('tingkat_kerusakan').value;
             const fotoInput           = document.getElementById('foto');
 
-            if (!judul_laporan || !lokasi_jalan || !kecamatan || !deskripsi_kerusakan || !tingkat_kerusakan) {
+            if (!kategori_id || !judul_laporan || !lokasi_jalan || !kecamatan || !deskripsi_kerusakan || !tingkat_kerusakan) {
                 showAlert('error', 'Semua field bertanda * wajib diisi');
                 return;
             }
@@ -392,6 +401,7 @@
 
             try {
                 const formData = new FormData();
+                formData.append('kategori_id', kategori_id);
                 formData.append('judul_laporan', judul_laporan);
                 formData.append('lokasi_jalan', lokasi_jalan);
                 formData.append('kecamatan', kecamatan);
@@ -530,12 +540,37 @@
             }
         }
 
+        async function loadCategories() {
+            const select = document.getElementById('kategori_id');
+            if (!select) return;
+
+            try {
+                const response = await fetch('api.php?action=get_kategori');
+                const res = await response.json();
+                if (res.success) {
+                    select.innerHTML = '<option value="">Pilih Kategori</option>';
+                    res.data.kategori.forEach(kat => {
+                        const opt = document.createElement('option');
+                        opt.value = kat.id;
+                        opt.textContent = kat.nama_kategori;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Gagal memuat kategori</option>';
+                }
+            } catch (err) {
+                console.error(err);
+                select.innerHTML = '<option value="">Gagal memuat kategori</option>';
+            }
+        }
+
         // =============================================
         // INIT SAAT HALAMAN LOADED
         // =============================================
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
             initPhotoUpload();
+            loadCategories();
         });
     </script>
 </body>

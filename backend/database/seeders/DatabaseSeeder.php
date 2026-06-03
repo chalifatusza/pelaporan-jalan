@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Kategori;
+use App\Models\Report;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -23,6 +25,7 @@ class DatabaseSeeder extends Seeder
                 'nama_lengkap' => 'Administrator',
                 'role' => 'admin',
                 'password' => 'admin123', // auto-hashed
+                'api_key' => 'api_key_admin_test_12345',
             ]
         );
 
@@ -36,15 +39,42 @@ class DatabaseSeeder extends Seeder
                 'no_telepon' => '081234567890',
                 'role' => 'user',
                 'password' => 'user123', // auto-hashed
+                'api_key' => 'api_key_user_test_54321',
+            ]
+        );
+
+        // Seed Default Categories
+        $katBerlubang = Kategori::updateOrCreate(
+            ['nama_kategori' => 'Jalan Berlubang'],
+            [
+                'user_id' => $admin->id,
+                'deskripsi' => 'Kerusakan aspal jalan berupa lubang dengan diameter bervariasi.'
+            ]
+        );
+
+        $katAmblas = Kategori::updateOrCreate(
+            ['nama_kategori' => 'Jalan Amblas'],
+            [
+                'user_id' => $admin->id,
+                'deskripsi' => 'Struktur tanah/aspal jalan menurun secara signifikan.'
+            ]
+        );
+
+        $katRetak = Kategori::updateOrCreate(
+            ['nama_kategori' => 'Jalan Retak'],
+            [
+                'user_id' => $admin->id,
+                'deskripsi' => 'Retakan memanjang pada permukaan aspal jalan.'
             ]
         );
 
         // Clear existing reports to avoid duplicate entries when re-seeding
-        \App\Models\Laporan::query()->delete();
+        Report::query()->delete();
 
         // Seed Mock Reports
-        \App\Models\Laporan::create([
+        Report::create([
             'user_id' => $user->id,
+            'kategori_id' => $katBerlubang->id,
             'judul_laporan' => 'Jalan Berlubang Besar',
             'lokasi_jalan' => 'Jl. Dharmahusada Indah Timur No. 35',
             'kecamatan' => 'Mulyorejo',
@@ -56,8 +86,9 @@ class DatabaseSeeder extends Seeder
             'foto_path' => null
         ]);
 
-        \App\Models\Laporan::create([
+        Report::create([
             'user_id' => $user->id,
+            'kategori_id' => $katAmblas->id,
             'judul_laporan' => 'Paving Amblas',
             'lokasi_jalan' => 'Jl. Raya Kertajaya Indah',
             'kecamatan' => 'Sukolilo',
@@ -69,12 +100,13 @@ class DatabaseSeeder extends Seeder
             'foto_path' => null
         ]);
 
-        \App\Models\Laporan::create([
+        Report::create([
             'user_id' => $user->id,
+            'kategori_id' => $katRetak->id,
             'judul_laporan' => 'Jalan Retak Seribu',
             'lokasi_jalan' => 'Jl. Manyar Kertoarjo',
             'kecamatan' => 'Mulyorejo',
-            'deskripsi_kerusakan' => 'Retakan memanjang di aspal sepanjang kurang lebih 5 meter. Sudah mulai melebar and berpotensi menjadi lubang jika tidak segera ditambal.',
+            'deskripsi_kerusakan' => 'Retakan memanjang di aspal sepanjang kurang lebih 5 meter. Sudah mulai melebar dan berpotensi menjadi lubang jika tidak segera ditambal.',
             'tingkat_kerusakan' => 'ringan',
             'status' => 'selesai',
             'latitude' => -7.2798,

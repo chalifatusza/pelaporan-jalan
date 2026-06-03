@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\Laporan;
+use App\Models\Kategori;
+use App\Models\Report;
+use App\Services\JWTService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,6 +17,7 @@ class LaporanTest extends TestCase
     private $admin;
     private $userToken;
     private $adminToken;
+    private $kategori;
 
     protected function setUp(): void
     {
@@ -28,7 +31,7 @@ class LaporanTest extends TestCase
             'nama_lengkap' => 'Regular User',
             'role' => 'user',
         ]);
-        $this->userToken = $this->user->createToken('user_token')->plainTextToken;
+        $this->userToken = JWTService::generateToken($this->user);
 
         // Create admin
         $this->admin = User::create([
@@ -38,7 +41,14 @@ class LaporanTest extends TestCase
             'nama_lengkap' => 'Admin User',
             'role' => 'admin',
         ]);
-        $this->adminToken = $this->admin->createToken('admin_token')->plainTextToken;
+        $this->adminToken = JWTService::generateToken($this->admin);
+
+        // Create a category
+        $this->kategori = Kategori::create([
+            'user_id' => $this->admin->id,
+            'nama_kategori' => 'Jalan Berlubang',
+            'deskripsi' => 'Kerusakan berupa lubang',
+        ]);
     }
 
     /**
@@ -49,6 +59,7 @@ class LaporanTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->userToken,
         ])->postJson('/api/laporan', [
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'Jalan Rusak Parah',
             'lokasi_jalan' => 'Jl. Mulyorejo No. 1',
             'kecamatan' => 'Mulyorejo',
@@ -64,9 +75,10 @@ class LaporanTest extends TestCase
                 'message' => 'Laporan berhasil dikirim',
             ]);
 
-        $this->assertDatabaseHas('laporan', [
+        $this->assertDatabaseHas('reports', [
             'judul_laporan' => 'Jalan Rusak Parah',
             'kecamatan' => 'Mulyorejo',
+            'kategori_id' => $this->kategori->id,
             'latitude' => -7.2650,
         ]);
     }
@@ -77,8 +89,9 @@ class LaporanTest extends TestCase
     public function test_laporan_index_regular_user()
     {
         // Report by user
-        Laporan::create([
+        Report::create([
             'user_id' => $this->user->id,
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'User Laporan',
             'lokasi_jalan' => 'Jl. User',
             'kecamatan' => 'Sukolilo',
@@ -92,8 +105,9 @@ class LaporanTest extends TestCase
             'email' => 'other@example.com',
             'nama_lengkap' => 'Other User',
         ]);
-        Laporan::create([
+        Report::create([
             'user_id' => $anotherUser->id,
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'Other Laporan',
             'lokasi_jalan' => 'Jl. Other',
             'kecamatan' => 'Mulyorejo',
@@ -116,8 +130,9 @@ class LaporanTest extends TestCase
     public function test_laporan_index_admin()
     {
         // Report by user
-        Laporan::create([
+        Report::create([
             'user_id' => $this->user->id,
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'User Laporan',
             'lokasi_jalan' => 'Jl. User',
             'kecamatan' => 'Sukolilo',
@@ -131,8 +146,9 @@ class LaporanTest extends TestCase
             'email' => 'other@example.com',
             'nama_lengkap' => 'Other User',
         ]);
-        Laporan::create([
+        Report::create([
             'user_id' => $anotherUser->id,
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'Other Laporan',
             'lokasi_jalan' => 'Jl. Other',
             'kecamatan' => 'Mulyorejo',
@@ -153,8 +169,9 @@ class LaporanTest extends TestCase
      */
     public function test_stats_endpoints()
     {
-        Laporan::create([
+        Report::create([
             'user_id' => $this->user->id,
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'Laporan 1',
             'lokasi_jalan' => 'Jl. Satu',
             'kecamatan' => 'Sukolilo',
@@ -185,8 +202,9 @@ class LaporanTest extends TestCase
      */
     public function test_map_coordinates_feed()
     {
-        Laporan::create([
+        Report::create([
             'user_id' => $this->user->id,
+            'kategori_id' => $this->kategori->id,
             'judul_laporan' => 'Laporan Dengan Map',
             'lokasi_jalan' => 'Jl. Map',
             'kecamatan' => 'Sukolilo',

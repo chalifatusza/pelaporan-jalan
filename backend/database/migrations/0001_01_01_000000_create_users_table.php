@@ -20,6 +20,9 @@ return new class extends Migration
             $table->text('alamat')->nullable();
             $table->string('no_telepon', 15)->nullable();
             $table->enum('role', ['user', 'admin'])->default('user');
+            $table->string('api_key', 64)->nullable()->unique();
+            $table->string('google_id')->nullable()->unique();
+            $table->string('github_id')->nullable()->unique();
             $table->timestamp('last_login')->nullable();
             $table->rememberToken();
             $table->timestamps();

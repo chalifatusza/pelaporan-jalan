@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Laporan;
+use App\Models\Report;
 use App\Mail\ReportStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +21,7 @@ class AdminController extends Controller
             return response()->json(['success' => false, 'message' => 'Akses ditolak']);
         }
 
-        $users = User::withCount('laporans')
+        $users = User::withCount('reports')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -34,7 +34,7 @@ class AdminController extends Controller
                 'no_telepon' => $u->no_telepon,
                 'role' => $u->role,
                 'tanggal_daftar' => $u->created_at->toDateTimeString(),
-                'total_laporan' => $u->laporans_count,
+                'total_laporan' => $u->reports_count,
             ];
         });
 
@@ -132,7 +132,7 @@ class AdminController extends Controller
         $range = $request->get('range', '');
         $search = $request->get('search', '');
 
-        $query = Laporan::with('user:id,nama_lengkap,email');
+        $query = Report::with('user:id,nama_lengkap,email');
 
         if (!empty($status)) {
             $query->where('status', $status);
@@ -216,7 +216,7 @@ class AdminController extends Controller
             return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
         }
 
-        $laporan = Laporan::with('user')->find($id);
+        $laporan = Report::with('user')->find($id);
 
         if (!$laporan) {
             return response()->json(['success' => false, 'message' => 'Laporan tidak ditemukan']);

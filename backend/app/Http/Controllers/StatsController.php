@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Laporan;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -15,9 +15,9 @@ class StatsController extends Controller
      */
     public function getGeneralStats()
     {
-        $totalLaporan = Laporan::count();
+        $totalLaporan = Report::count();
         
-        $statusCounts = Laporan::select('status', DB::raw('count(*) as count'))
+        $statusCounts = Report::select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status')
             ->toArray();
@@ -50,15 +50,15 @@ class StatsController extends Controller
     {
         $userId = $request->user()->id;
 
-        $totalLaporan = Laporan::where('user_id', $userId)->count();
+        $totalLaporan = Report::where('user_id', $userId)->count();
 
-        $statusCounts = Laporan::where('user_id', $userId)
+        $statusCounts = Report::where('user_id', $userId)
             ->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status')
             ->toArray();
 
-        $laporanBulanIni = Laporan::where('user_id', $userId)
+        $laporanBulanIni = Report::where('user_id', $userId)
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
             ->count();
 
@@ -85,7 +85,7 @@ class StatsController extends Controller
     public function getStatusStats(Request $request)
     {
         $range = $request->get('range', 'all');
-        $query = Laporan::select('status', DB::raw('count(*) as total'));
+        $query = Report::select('status', DB::raw('count(*) as total'));
 
         $this->applyRangeFilter($query, $range);
 
@@ -110,7 +110,7 @@ class StatsController extends Controller
     public function getKerusakanStats(Request $request)
     {
         $range = $request->get('range', 'all');
-        $query = Laporan::select('tingkat_kerusakan', DB::raw('count(*) as total'));
+        $query = Report::select('tingkat_kerusakan', DB::raw('count(*) as total'));
 
         $this->applyRangeFilter($query, $range);
 
@@ -135,7 +135,7 @@ class StatsController extends Controller
     public function getKecamatanStats(Request $request)
     {
         $range = $request->get('range', 'all');
-        $query = Laporan::select(
+        $query = Report::select(
             'kecamatan',
             DB::raw('count(*) as total'),
             DB::raw("sum(case when status = 'selesai' then 1 else 0 end) as selesai"),

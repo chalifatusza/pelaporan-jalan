@@ -53,11 +53,25 @@
                             Masuk
                         </button>
                     </div>
-                    
-                    <div class="form-text text-center">
-                        <a href="#" class="text-primary">Lupa password?</a>
-                    </div>
                 </form>
+                
+                <div style="text-align: center; margin: 20px 0; position: relative;">
+                    <span style="background: white; padding: 0 10px; color: #6c757d; font-size: 0.9rem; position: relative; z-index: 1;">Atau masuk dengan</span>
+                    <hr style="position: absolute; top: 50%; left: 0; right: 0; border: none; border-top: 1px solid #dee2e6; margin: 0; z-index: 0;">
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-outline" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #dadce0; background: white;" onclick="loginWithOAuth('google')">
+                        <i class="fab fa-google" style="color: #ea4335;"></i> Google
+                    </button>
+                    <button type="button" class="btn btn-outline" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #dadce0; background: white;" onclick="loginWithOAuth('github')">
+                        <i class="fab fa-github" style="color: #333;"></i> GitHub
+                    </button>
+                </div>
+                
+                <div class="form-text text-center">
+                    <a href="#" class="text-primary">Lupa password?</a>
+                </div>
                 
                 <div class="demo-credentials" style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
                     <h3 style="font-size: 1rem; margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Demo Credentials:</h3>

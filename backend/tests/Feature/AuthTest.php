@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Services\JWTService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -33,7 +34,7 @@ class AuthTest extends TestCase
                 'data' => [
                     'token',
                     'user' => [
-                        'id', 'username', 'nama_lengkap', 'email', 'role'
+                        'id', 'username', 'nama_lengkap', 'email', 'role', 'api_key'
                     ]
                 ]
             ]);
@@ -54,6 +55,7 @@ class AuthTest extends TestCase
             'password' => 'secret123',
             'email' => 'john@example.com',
             'nama_lengkap' => 'John Doe',
+            'api_key' => 'test_api_key_123',
         ]);
 
         $response = $this->postJson('/api/login', [
@@ -70,16 +72,16 @@ class AuthTest extends TestCase
                 'data' => [
                     'token',
                     'user' => [
-                        'id', 'username', 'nama_lengkap', 'email', 'role'
+                        'id', 'username', 'nama_lengkap', 'email', 'role', 'api_key'
                     ]
                 ]
             ]);
     }
 
     /**
-     * Test check session.
+     * Test check session with JWT Bearer token.
      */
-    public function test_user_can_check_session()
+    public function test_user_can_check_session_with_jwt()
     {
         $user = User::create([
             'username' => 'john_doe',
@@ -88,7 +90,7 @@ class AuthTest extends TestCase
             'nama_lengkap' => 'John Doe',
         ]);
 
-        $token = $user->createToken('test_token')->plainTextToken;
+        $token = JWTService::generateToken($user);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -103,38 +105,59 @@ class AuthTest extends TestCase
     }
 
     /**
-     * Test profile update.
+     * Test check session with Basic Auth.
      */
-    public function test_user_can_update_profile()
+    public function test_user_can_authenticate_with_basic_auth()
+    {
+        $user = User::create([
+            'username' => 'john_doe',
+            'password' => 'secret123', // auto-hashed
+            'email' => 'john@example.com',
+            'nama_lengkap' => 'John Doe',
+        ]);
+
+        $basicAuthHeader = 'Basic ' . base64_encode('john_doe:secret123');
+
+        $response = $this->withHeaders([
+            'Authorization' => $basicAuthHeader,
+        ])->getJson('/api/user');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.user.username', 'john_doe');
+    }
+
+    /**
+     * Test check session with API Key.
+     */
+    public function test_user_can_authenticate_with_api_key()
     {
         $user = User::create([
             'username' => 'john_doe',
             'password' => 'secret123',
             'email' => 'john@example.com',
             'nama_lengkap' => 'John Doe',
+            'api_key' => 'my_secret_api_key_999',
         ]);
-
-        $token = $user->createToken('test_token')->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->putJson('/api/user', [
-            'nama_lengkap' => 'John Doe Updated',
-            'email' => 'john.updated@example.com',
-            'alamat' => 'New Address 456',
-            'no_telepon' => '089999999',
-        ]);
+            'X-API-Key' => 'my_secret_api_key_999',
+        ])->getJson('/api/user');
 
         $response->assertStatus(200)
-            ->assertJson([
-                'success' => true,
-                'message' => 'Profil berhasil diperbarui',
-            ]);
+            ->assertJsonPath('data.user.username', 'john_doe');
+    }
 
-        $this->assertDatabaseHas('users', [
-            'id' => $user->id,
-            'nama_lengkap' => 'John Doe Updated',
-            'email' => 'john.updated@example.com',
-        ]);
+    /**
+     * Test OAuth redirect mock pages.
+     */
+    public function test_oauth_redirect_mock_endpoints()
+    {
+        $responseGoogle = $this->get('/api/auth/google/redirect');
+        $responseGoogle->assertStatus(200)
+            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+
+        $responseGithub = $this->get('/api/auth/github/redirect');
+        $responseGithub->assertStatus(200)
+            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
     }
 }

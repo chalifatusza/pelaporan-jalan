@@ -1,6 +1,7 @@
 // ==================== API INTERCEPTOR ====================
 (function() {
-    let API_BASE_URL = localStorage.getItem('API_BASE_URL') || 'http://localhost:8000/api';
+    let API_BASE_URL = localStorage.getItem('API_BASE_URL') || 
+        (window.location.protocol === 'file:' ? 'http://localhost:8000/api' : '/api');
 
     const originalFetch = window.fetch;
 
@@ -115,6 +116,10 @@
                     path = `/stats/kecamatan?range=${rangeFilter}`;
                     method = 'GET';
                     break;
+                case 'get_kategori':
+                    path = '/kategori';
+                    method = 'GET';
+                    break;
                 case 'check_gd':
                     return new Response(JSON.stringify({ success: true, data: { gd_available: true } }), {
                         headers: { 'Content-Type': 'application/json' }
@@ -222,6 +227,18 @@
     };
 })();
 // ==================== END API INTERCEPTOR ====================
+
+window.loginWithOAuth = function(provider) {
+    let API_BASE_URL = localStorage.getItem('API_BASE_URL') || 
+        (window.location.protocol === 'file:' ? 'http://localhost:8000/api' : '/api');
+    
+    let frontendUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+    if (window.location.protocol === 'file:') {
+        frontendUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+    }
+    
+    window.location.href = `${API_BASE_URL}/auth/${provider}/redirect?frontend_url=${encodeURIComponent(frontendUrl)}`;
+};
 
 let currentUser = null;
 let allLaporanData = [];

@@ -28,6 +28,9 @@ class User extends Authenticatable
         'no_telepon',
         'role',
         'last_login',
+        'api_key',
+        'google_id',
+        'github_id',
     ];
 
     /**
@@ -56,9 +59,17 @@ class User extends Authenticatable
     /**
      * Get all reports submitted by the user.
      */
-    public function laporans(): HasMany
+    public function reports(): HasMany
     {
-        return $this->hasMany(Laporan::class);
+        return $this->hasMany(Report::class);
+    }
+
+    /**
+     * Get all categories created by the user.
+     */
+    public function kategoris(): HasMany
+    {
+        return $this->hasMany(Kategori::class);
     }
 
     /**

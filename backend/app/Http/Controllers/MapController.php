@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Laporan;
+use App\Models\Report;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
@@ -12,7 +12,7 @@ class MapController extends Controller
      */
     public function getMapLaporan()
     {
-        $laporans = Laporan::with('user:id,nama_lengkap')
+        $laporans = Report::with('user:id,nama_lengkap')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->orderBy('created_at', 'desc')

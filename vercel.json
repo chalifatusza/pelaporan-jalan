@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "functions": {
+    "backend/api/index.php": {
+      "runtime": "vercel-php@0.7.2"
+    },
+    "backend/public/adminer.php": {
+      "runtime": "vercel-php@0.7.2"
+    }
+  },
+  "routes": [
+    {
+      "src": "/adminer.php",
+      "dest": "/backend/public/adminer.php"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/api/index.php"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/backend/public/uploads/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
