@@ -265,9 +265,37 @@ async function checkLoginStatusForHomepage() {
         const step1Buttons = document.getElementById('step1Buttons');
         
         if (data.success) {
-            // User is logged in - redirect to dashboard directly
+            // User is logged in - update UI, do not redirect
             const user = data.data.user;
-            window.location.href = user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html';
+            
+            if (dashboardLink) {
+                dashboardLink.style.display = 'block';
+            }
+            if (dashboardLinkAnchor) {
+                dashboardLinkAnchor.href = user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html';
+            }
+            if (authButtons) {
+                authButtons.innerHTML = `
+                    <span class="user-greeting-home" style="margin-right: 15px; font-weight: 500; color: white;">Halo, ${user.nama}</span>
+                    <a href="#" onclick="logout()" class="btn btn-outline">Keluar</a>
+                `;
+            }
+            if (heroAuthButtons) {
+                heroAuthButtons.innerHTML = `
+                    <a href="${user.role === 'admin' ? 'dashboard-admin.html' : 'dashboard-user.html'}" class="btn btn-primary btn-large">Pergi ke Dashboard</a>
+                    <a href="#cara-lapor" class="btn btn-outline btn-large">Cara Melapor</a>
+                `;
+            }
+            if (authSection) {
+                authSection.style.display = 'none';
+            }
+            if (step1Buttons) {
+                step1Buttons.innerHTML = `
+                    <div style="margin-top: 10px; margin-left: 27px; color: var(--primary); font-weight: 500;">
+                        <i class="fas fa-check-circle"></i> Anda sudah masuk
+                    </div>
+                `;
+            }
             return;
         } else {
             // User is not logged in
