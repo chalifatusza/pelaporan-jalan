@@ -321,31 +321,49 @@
                 showAlert('error', 'Browser Anda tidak mendukung fitur GPS');
                 return;
             }
+
+            if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                showAlert('warning', 'GPS mungkin diblokir oleh browser karena situs menggunakan HTTP biasa (bukan HTTPS).');
+            }
+
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendeteksi lokasi...';
 
-            navigator.geolocation.getCurrentPosition(
-                function(pos) {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    map.setView([lat, lng], 17);
-                    setMapLocation(lat, lng);
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)';
-                    showAlert('success', 'Lokasi GPS berhasil dideteksi!');
-                },
-                function(err) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)';
-                    const msgs = {
-                        1: 'Akses lokasi ditolak. Izinkan akses lokasi di browser.',
-                        2: 'Lokasi tidak tersedia. Coba klik langsung di peta.',
-                        3: 'Timeout saat mendapatkan lokasi. Coba lagi.'
-                    };
-                    showAlert('error', msgs[err.code] || 'Gagal mendapatkan lokasi GPS.');
-                },
-                { timeout: 10000, enableHighAccuracy: true }
-            );
+            const options = { timeout: 10000, enableHighAccuracy: true };
+
+            function successCallback(pos) {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                map.setView([lat, lng], 17);
+                setMapLocation(lat, lng);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)';
+                showAlert('success', 'Lokasi GPS berhasil dideteksi!');
+            }
+
+            function errorCallback(err) {
+                if (err.code === 3 && options.enableHighAccuracy) {
+                    console.warn("GPS timeout with high accuracy, retrying with low accuracy...");
+                    options.enableHighAccuracy = false;
+                    options.timeout = 5000;
+                    navigator.geolocation.getCurrentPosition(successCallback, finalErrorCallback, options);
+                } else {
+                    finalErrorCallback(err);
+                }
+            }
+
+            function finalErrorCallback(err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> Gunakan Lokasi Saya (GPS)';
+                const msgs = {
+                    1: 'Akses lokasi ditolak. Silakan izinkan akses lokasi di browser Anda.',
+                    2: 'Lokasi tidak tersedia. Silakan klik langsung di peta untuk memilih lokasi.',
+                    3: 'Timeout saat mendeteksi lokasi. Coba lagi atau klik langsung di peta.'
+                };
+                showAlert('error', msgs[err.code] || 'Gagal mendapatkan lokasi GPS.');
+            }
+
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
         }
 
         // =============================================

@@ -34,7 +34,7 @@
     },
     {
       "src": "/uploads/(.*)",
-      "dest": "/backend/public/uploads/$1"
+      "dest": "/api/index.php"
     },
     {
       "src": "/(.*)",

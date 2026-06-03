@@ -130,23 +130,38 @@ class ReportController extends Controller
 
         $fotoPath = '';
         if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            
-            $rootUploadsDir = base_path('../uploads');
-            if (!is_dir($rootUploadsDir)) {
-                mkdir($rootUploadsDir, 0777, true);
-            }
-
-            $fileExt = $file->getClientOriginalExtension();
-            $fileName = time() . '_' . uniqid() . '.' . $fileExt;
-            $targetPath = $rootUploadsDir . '/' . $fileName;
-
-            if ($file->move($rootUploadsDir, $fileName)) {
-                $fotoPath = 'uploads/' . $fileName;
-
-                if (extension_loaded('gd')) {
-                    $this->compressImage($targetPath, $targetPath, 80);
+            try {
+                $file = $request->file('foto');
+                
+                $rootUploadsDir = base_path('../uploads');
+                $isWritable = true;
+                
+                if (!is_dir($rootUploadsDir)) {
+                    if (!@mkdir($rootUploadsDir, 0777, true)) {
+                        $isWritable = false;
+                    }
+                } elseif (!is_writable($rootUploadsDir)) {
+                    $isWritable = false;
                 }
+
+                if (!$isWritable || isset($_SERVER['VERCEL']) || env('VERCEL') || isset($_ENV['VERCEL'])) {
+                    // Fallback to /tmp on Vercel or read-only environments
+                    $rootUploadsDir = '/tmp';
+                }
+
+                $fileExt = $file->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExt;
+                $targetPath = $rootUploadsDir . '/' . $fileName;
+
+                if ($file->move($rootUploadsDir, $fileName)) {
+                    $fotoPath = 'uploads/' . $fileName;
+
+                    if (extension_loaded('gd')) {
+                        @$this->compressImage($targetPath, $targetPath, 80);
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('File upload failed: ' . $e->getMessage());
             }
         }
 
