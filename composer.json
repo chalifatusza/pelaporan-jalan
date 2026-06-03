@@ -1,0 +1,36 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "chalifatusza/pelaporan-jalan",
+    "type": "project",
+    "description": "Monorepo root for Laravel on Vercel.",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "firebase/php-jwt": "^7.0",
+        "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^2.10.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "backend/app/",
+            "Database\\Factories\\": "backend/database/factories/",
+            "Database\\Seeders\\": "backend/database/seeders/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php backend/artisan package:discover --ansi"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
