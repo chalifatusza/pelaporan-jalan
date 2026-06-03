@@ -258,7 +258,7 @@ class AuthController extends Controller
         $clientSecret = env('GOOGLE_CLIENT_SECRET');
 
         if (!empty($clientId) && !empty($clientSecret)) {
-            $redirectUri = $request->getSchemeAndHttpHost() . '/api/auth/google/callback';
+            $redirectUri = url('/api/auth/google/callback');
             $query = http_build_query([
                 'client_id' => $clientId,
                 'redirect_uri' => $redirectUri,
@@ -338,7 +338,7 @@ class AuthController extends Controller
         $clientSecret = env('GOOGLE_CLIENT_SECRET');
 
         if (!empty($clientId) && !empty($clientSecret) && $code !== 'mock_code') {
-            $redirectUri = $request->getSchemeAndHttpHost() . '/api/auth/google/callback';
+            $redirectUri = url('/api/auth/google/callback');
             
             $response = Http::post('https://oauth2.googleapis.com/token', [
                 'client_id' => $clientId,
@@ -437,7 +437,7 @@ class AuthController extends Controller
         $clientSecret = env('GITHUB_CLIENT_SECRET');
 
         if (!empty($clientId) && !empty($clientSecret)) {
-            $redirectUri = $request->getSchemeAndHttpHost() . '/api/auth/github/callback';
+            $redirectUri = url('/api/auth/github/callback');
             $query = http_build_query([
                 'client_id' => $clientId,
                 'redirect_uri' => $redirectUri,
@@ -502,7 +502,7 @@ class AuthController extends Controller
         $clientSecret = env('GITHUB_CLIENT_SECRET');
 
         if (!empty($clientId) && !empty($clientSecret) && $code !== 'mock_code') {
-            $redirectUri = $request->getSchemeAndHttpHost() . '/api/auth/github/callback';
+            $redirectUri = url('/api/auth/github/callback');
 
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
