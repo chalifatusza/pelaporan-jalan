@@ -10,7 +10,10 @@
     "CACHE_STORE": "array",
     "CACHE_DRIVER": "array",
     "LOG_CHANNEL": "stderr",
-    "SESSION_DRIVER": "cookie"
+    "SESSION_DRIVER": "cookie",
+    "DB_CONNECTION": "mysql",
+    "APP_ENV": "production",
+    "APP_DEBUG": "false"
   },
   "functions": {
     "api/index.php": {

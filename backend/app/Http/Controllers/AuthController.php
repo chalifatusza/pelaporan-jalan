@@ -254,6 +254,22 @@ class AuthController extends Controller
     {
         $frontendUrl = $request->query('frontend_url', '');
 
+        $clientId = env('GOOGLE_CLIENT_ID');
+        $clientSecret = env('GOOGLE_CLIENT_SECRET');
+
+        if (!empty($clientId) && !empty($clientSecret)) {
+            $redirectUri = $request->getSchemeAndHttpHost() . '/api/auth/google/callback';
+            $query = http_build_query([
+                'client_id' => $clientId,
+                'redirect_uri' => $redirectUri,
+                'response_type' => 'code',
+                'scope' => 'openid profile email',
+                'state' => $frontendUrl,
+            ]);
+
+            return redirect('https://accounts.google.com/o/oauth2/v2/auth?' . $query);
+        }
+
         // Simple mock redirect screen
         $htmlContent = "
         <!DOCTYPE html>
