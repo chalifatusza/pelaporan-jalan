@@ -26,6 +26,12 @@ Route::get('/db-debug', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/stats', [StatsController::class, 'getGeneralStats']);
+Route::get('/test-headers', function (\Illuminate\Http\Request $request) {
+    return response()->json([
+        'headers' => $request->headers->all(),
+        'authorization' => $request->header('Authorization'),
+    ]);
+});
 
 // OAuth2 Social Login Routes (Public)
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect']);
