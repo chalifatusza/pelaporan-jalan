@@ -47,6 +47,8 @@
 									"if(jsonData.success && jsonData.data && jsonData.data.token) {",
 									"    pm.environment.set(\"jwt_token\", jsonData.data.token);",
 									"    pm.environment.set(\"api_key\", jsonData.data.user.api_key);",
+									"    pm.collectionVariables.set(\"jwt_token\", jsonData.data.token);",
+									"    pm.collectionVariables.set(\"api_key\", jsonData.data.user.api_key);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -149,7 +151,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/user",
 							"host": [
@@ -177,7 +185,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/user/profile",
 							"host": [
@@ -206,7 +220,13 @@
 							]
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/user/api-key",
 							"host": [
@@ -309,7 +329,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/kategori",
 							"host": [
@@ -341,6 +367,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -379,7 +410,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/reports",
 							"host": [
@@ -407,7 +444,13 @@
 							]
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -485,7 +528,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/admin/users",
 							"host": [
@@ -518,6 +567,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
 							}
 						],
 						"body": {
