@@ -83,7 +83,10 @@ class AuthController extends Controller
             ]);
         }
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('username', $request->username)
+            ->orWhere('email', $request->username)
+            ->orWhere('nama_lengkap', $request->username)
+            ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
@@ -265,6 +268,7 @@ class AuthController extends Controller
                 'response_type' => 'code',
                 'scope' => 'openid profile email',
                 'state' => $frontendUrl,
+                'prompt' => 'select_account',
             ]);
 
             return redirect('https://accounts.google.com/o/oauth2/v2/auth?' . $query);
@@ -436,6 +440,11 @@ class AuthController extends Controller
         $clientId = env('GITHUB_CLIENT_ID');
         $clientSecret = env('GITHUB_CLIENT_SECRET');
 
+        // Fix typo on Vercel environment variable
+        if ($clientId === 'Ov231cIUoqe1ROhoz42') {
+            $clientId = 'Ov231iCIUoqE1ROhoz42';
+        }
+
         if (!empty($clientId) && !empty($clientSecret)) {
             $redirectUri = url('/api/auth/github/callback');
             $query = http_build_query([
@@ -500,6 +509,11 @@ class AuthController extends Controller
 
         $clientId = env('GITHUB_CLIENT_ID');
         $clientSecret = env('GITHUB_CLIENT_SECRET');
+
+        // Fix typo on Vercel environment variable
+        if ($clientId === 'Ov231cIUoqe1ROhoz42') {
+            $clientId = 'Ov231iCIUoqE1ROhoz42';
+        }
 
         if (!empty($clientId) && !empty($clientSecret) && $code !== 'mock_code') {
             $redirectUri = url('/api/auth/github/callback');

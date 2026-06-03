@@ -9,9 +9,23 @@ use App\Http\Controllers\MapController;
 use App\Http\Middleware\ApiAuthenticate;
 use Illuminate\Support\Facades\Route;
 
+// Debug Routes
+Route::get('/db-debug', function () {
+    return response()->json([
+        'success' => true,
+        'connection' => config('database.default'),
+        'host' => config('database.connections.mysql.host'),
+        'database' => config('database.connections.mysql.database'),
+        'username' => config('database.connections.mysql.username'),
+        'users_count' => \App\Models\User::count(),
+        'reports_count' => \App\Models\Report::count(),
+    ]);
+});
+
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/stats', [StatsController::class, 'getGeneralStats']);
 
 // OAuth2 Social Login Routes (Public)
 Route::get('/auth/google/redirect', [AuthController::class, 'googleRedirect']);
@@ -39,7 +53,6 @@ Route::middleware(ApiAuthenticate::class)->group(function () {
     Route::get('/laporan-map', [MapController::class, 'getMapLaporan']);
 
     // Stats endpoints
-    Route::get('/stats', [StatsController::class, 'getGeneralStats']);
     Route::get('/stats/user', [StatsController::class, 'getUserStats']);
     Route::get('/stats/status', [StatsController::class, 'getStatusStats']);
     Route::get('/stats/kerusakan', [StatsController::class, 'getKerusakanStats']);
