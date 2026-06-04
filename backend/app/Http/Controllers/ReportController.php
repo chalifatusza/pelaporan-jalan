@@ -132,34 +132,17 @@ class ReportController extends Controller
         if ($request->hasFile('foto')) {
             try {
                 $file = $request->file('foto');
+                $tempPath = $file->getRealPath();
                 
-                $rootUploadsDir = base_path('../uploads');
-                $isWritable = true;
+                // Compress if GD is loaded
+                if (extension_loaded('gd')) {
+                    $this->compressImage($tempPath, $tempPath, 80);
+                }
                 
-                if (!is_dir($rootUploadsDir)) {
-                    if (!@mkdir($rootUploadsDir, 0777, true)) {
-                        $isWritable = false;
-                    }
-                } elseif (!is_writable($rootUploadsDir)) {
-                    $isWritable = false;
-                }
-
-                if (!$isWritable || isset($_SERVER['VERCEL']) || env('VERCEL') || isset($_ENV['VERCEL'])) {
-                    // Fallback to /tmp on Vercel or read-only environments
-                    $rootUploadsDir = '/tmp';
-                }
-
-                $fileExt = $file->getClientOriginalExtension();
-                $fileName = time() . '_' . uniqid() . '.' . $fileExt;
-                $targetPath = $rootUploadsDir . '/' . $fileName;
-
-                if ($file->move($rootUploadsDir, $fileName)) {
-                    $fotoPath = 'uploads/' . $fileName;
-
-                    if (extension_loaded('gd')) {
-                        @$this->compressImage($targetPath, $targetPath, 80);
-                    }
-                }
+                $mimeType = $file->getMimeType();
+                $fileData = file_get_contents($tempPath);
+                $base64 = base64_encode($fileData);
+                $fotoPath = 'data:' . $mimeType . ';base64,' . $base64;
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning('File upload failed: ' . $e->getMessage());
             }
@@ -247,40 +230,26 @@ class ReportController extends Controller
         if ($request->hasFile('foto')) {
             try {
                 $file = $request->file('foto');
+                $tempPath = $file->getRealPath();
                 
-                $rootUploadsDir = base_path('../uploads');
-                $isWritable = true;
+                // Compress if GD is loaded
+                if (extension_loaded('gd')) {
+                    $this->compressImage($tempPath, $tempPath, 80);
+                }
                 
-                if (!is_dir($rootUploadsDir)) {
-                    if (!@mkdir($rootUploadsDir, 0777, true)) {
-                        $isWritable = false;
-                    }
-                } elseif (!is_writable($rootUploadsDir)) {
-                    $isWritable = false;
-                }
-
-                if (!$isWritable || isset($_SERVER['VERCEL']) || env('VERCEL') || isset($_ENV['VERCEL'])) {
-                    $rootUploadsDir = '/tmp';
-                }
-
-                $fileExt = $file->getClientOriginalExtension();
-                $fileName = time() . '_' . uniqid() . '.' . $fileExt;
-                $targetPath = $rootUploadsDir . '/' . $fileName;
-
-                if ($file->move($rootUploadsDir, $fileName)) {
-                    if ($report->foto_path) {
-                        $oldFullPath = base_path('../' . $report->foto_path);
-                        if (file_exists($oldFullPath)) {
-                            @unlink($oldFullPath);
-                        }
-                    }
-
-                    $fotoPath = 'uploads/' . $fileName;
-
-                    if (extension_loaded('gd')) {
-                        @$this->compressImage($targetPath, $targetPath, 80);
+                $mimeType = $file->getMimeType();
+                $fileData = file_get_contents($tempPath);
+                $base64 = base64_encode($fileData);
+                
+                // Delete old file if it was stored on filesystem (not Base64)
+                if ($report->foto_path && strpos($report->foto_path, 'data:') !== 0) {
+                    $oldFullPath = base_path('../' . $report->foto_path);
+                    if (file_exists($oldFullPath)) {
+                        @unlink($oldFullPath);
                     }
                 }
+                
+                $fotoPath = 'data:' . $mimeType . ';base64,' . $base64;
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning('File upload failed during update: ' . $e->getMessage());
             }
@@ -326,7 +295,7 @@ class ReportController extends Controller
             ]);
         }
 
-        if ($report->foto_path) {
+        if ($report->foto_path && strpos($report->foto_path, 'data:') !== 0) {
             $fullPath = base_path('../' . $report->foto_path);
             if (file_exists($fullPath)) {
                 unlink($fullPath);

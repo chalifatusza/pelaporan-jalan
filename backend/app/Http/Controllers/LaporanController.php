@@ -105,26 +105,21 @@ class LaporanController extends Controller
 
         $fotoPath = '';
         if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            
-            // Save in root uploads directory for frontend path compatibility
-            $rootUploadsDir = base_path('../uploads');
-            if (!is_dir($rootUploadsDir)) {
-                mkdir($rootUploadsDir, 0777, true);
-            }
-
-            $fileExt = $file->getClientOriginalExtension();
-            $fileName = time() . '_' . uniqid() . '.' . $fileExt;
-            $targetPath = $rootUploadsDir . '/' . $fileName;
-
-            // Move the file
-            if ($file->move($rootUploadsDir, $fileName)) {
-                $fotoPath = 'uploads/' . $fileName;
-
+            try {
+                $file = $request->file('foto');
+                $tempPath = $file->getRealPath();
+                
                 // Compress image if GD is loaded
                 if (extension_loaded('gd')) {
-                    $this->compressImage($targetPath, $targetPath, 80);
+                    $this->compressImage($tempPath, $tempPath, 80);
                 }
+                
+                $mimeType = $file->getMimeType();
+                $fileData = file_get_contents($tempPath);
+                $base64 = base64_encode($fileData);
+                $fotoPath = 'data:' . $mimeType . ';base64,' . $base64;
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('File upload failed in legacy controller: ' . $e->getMessage());
             }
         }
 
@@ -233,7 +228,7 @@ class LaporanController extends Controller
         }
 
         // Delete associated image file
-        if ($laporan->foto_path) {
+        if ($laporan->foto_path && strpos($laporan->foto_path, 'data:') !== 0) {
             $fullPath = base_path('../' . $laporan->foto_path);
             if (file_exists($fullPath)) {
                 unlink($fullPath);
