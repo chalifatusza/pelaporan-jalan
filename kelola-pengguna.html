@@ -366,7 +366,7 @@
                 const res  = await fetch('api.php', { method: 'POST', body: fd });
                 const json = await res.json();
                 closeDeleteModal();
-                showToast(json.success && json.affected > 0
+                showToast(json.success
                     ? '✅ Pengguna berhasil dihapus'
                     : '❌ Gagal menghapus pengguna');
                 if (json.success) loadUsersData();

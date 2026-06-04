@@ -355,9 +355,9 @@
                     <td>
                         <select class="form-control" style="padding:5px 8px;font-size:0.82rem;width:120px;"
                             onchange="updateStatusLaporan(${laporan.id}, this.value)">
-                            <option value="Dikirim"  ${laporan.status === 'Dikirim'  ? 'selected' : ''}>Dikirim</option>
-                            <option value="Diproses" ${laporan.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
-                            <option value="Selesai"  ${laporan.status === 'Selesai'  ? 'selected' : ''}>Selesai</option>
+                            <option value="dikirim"  ${laporan.status === 'dikirim' || laporan.status === 'Dikirim'  ? 'selected' : ''}>Dikirim</option>
+                            <option value="diproses" ${laporan.status === 'diproses' || laporan.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
+                            <option value="selesai"  ${laporan.status === 'selesai' || laporan.status === 'Selesai'  ? 'selected' : ''}>Selesai</option>
                         </select>
                     </td>
                     <td>

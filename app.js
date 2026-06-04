@@ -8,8 +8,8 @@
     window.fetch = async function(resource, init) {
         if (typeof resource === 'string' && (resource.includes('api.php') || resource === 'api.php')) {
             const urlObj = new URL(resource, window.location.origin);
-            const action = urlObj.searchParams.get('action') || '';
-            const id = urlObj.searchParams.get('id') || '';
+            let action = urlObj.searchParams.get('action') || '';
+            let id = urlObj.searchParams.get('id') || '';
             const page = urlObj.searchParams.get('page') || '';
             const statusFilter = urlObj.searchParams.get('status') || '';
             const tingkatFilter = urlObj.searchParams.get('tingkat_kerusakan') || '';
@@ -20,6 +20,17 @@
             let method = (init && init.method) ? init.method.toUpperCase() : 'GET';
             let path = '';
             let isFormData = false;
+            let body = init ? init.body : null;
+
+            if (body instanceof FormData) {
+                isFormData = true;
+                if (!action) {
+                    action = body.get('action') || '';
+                }
+                if (!id) {
+                    id = body.get('id') || body.get('laporan_id') || body.get('user_id') || '';
+                }
+            }
 
             switch (action) {
                 case 'login':
@@ -57,7 +68,7 @@
                     break;
                 case 'update_laporan':
                     path = `/laporan/${id || ''}`;
-                    method = 'POST';
+                    method = 'PUT';
                     break;
                 case 'delete_laporan':
                     path = `/laporan/${id || ''}`;
@@ -693,6 +704,11 @@ async function handleEditLaporan(e) {
         formData.append('deskripsi_kerusakan', deskripsi_kerusakan);
         formData.append('tingkat_kerusakan', tingkat_kerusakan);
         formData.append('status', status);
+        
+        const fotoInput = document.getElementById('foto');
+        if (fotoInput && fotoInput.files.length > 0) {
+            formData.append('foto', fotoInput.files[0]);
+        }
         
         const response = await fetch('api.php?action=update_laporan', {
             method: 'POST',

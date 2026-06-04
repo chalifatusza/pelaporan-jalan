@@ -215,6 +215,7 @@ class ReportController extends Controller
             'deskripsi_kerusakan' => 'required|string',
             'tingkat_kerusakan' => 'required|in:ringan,sedang,berat',
             'status' => 'nullable|in:dikirim,diproses,selesai',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
@@ -232,9 +233,60 @@ class ReportController extends Controller
             'kecamatan' => $request->kecamatan,
             'deskripsi_kerusakan' => $request->deskripsi_kerusakan,
             'tingkat_kerusakan' => $request->tingkat_kerusakan,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
         ];
+
+        if ($request->has('latitude')) {
+            $data['latitude'] = $request->latitude;
+        }
+
+        if ($request->has('longitude')) {
+            $data['longitude'] = $request->longitude;
+        }
+
+        $fotoPath = $report->foto_path;
+        if ($request->hasFile('foto')) {
+            try {
+                $file = $request->file('foto');
+                
+                $rootUploadsDir = base_path('../uploads');
+                $isWritable = true;
+                
+                if (!is_dir($rootUploadsDir)) {
+                    if (!@mkdir($rootUploadsDir, 0777, true)) {
+                        $isWritable = false;
+                    }
+                } elseif (!is_writable($rootUploadsDir)) {
+                    $isWritable = false;
+                }
+
+                if (!$isWritable || isset($_SERVER['VERCEL']) || env('VERCEL') || isset($_ENV['VERCEL'])) {
+                    $rootUploadsDir = '/tmp';
+                }
+
+                $fileExt = $file->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExt;
+                $targetPath = $rootUploadsDir . '/' . $fileName;
+
+                if ($file->move($rootUploadsDir, $fileName)) {
+                    if ($report->foto_path) {
+                        $oldFullPath = base_path('../' . $report->foto_path);
+                        if (file_exists($oldFullPath)) {
+                            @unlink($oldFullPath);
+                        }
+                    }
+
+                    $fotoPath = 'uploads/' . $fileName;
+
+                    if (extension_loaded('gd')) {
+                        @$this->compressImage($targetPath, $targetPath, 80);
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('File upload failed during update: ' . $e->getMessage());
+            }
+        }
+        
+        $data['foto_path'] = $fotoPath;
 
         if ($request->has('kategori_id')) {
             $data['kategori_id'] = $request->kategori_id;

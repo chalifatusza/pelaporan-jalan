@@ -394,7 +394,7 @@
                     const tbody = document.querySelector('#recentLaporanTable tbody');
                     const list  = data.data.laporan.slice(0, 5);
                     if (list.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:30px;">Belum ada laporan</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:30px;">Belum ada laporan</td></tr>';
                         return;
                     }
                     tbody.innerHTML = list.map(l => `
@@ -403,15 +403,19 @@
                             <td><strong>${l.judul_laporan}</strong></td>
                             <td>${l.nama_lengkap || l.username}</td>
                             <td>${l.lokasi_jalan}</td>
+                            <td>${l.kecamatan}</td>
                             <td>${formatDate(l.tanggal_laporan_formatted)}</td>
                             <td><span class="status-badge status-${l.status}">${l.status}</span></td>
+                            <td><span class="kerusakan-${l.tingkat_kerusakan} status-badge">${l.tingkat_kerusakan}</span></td>
                             <td>
-                                <a href="edit-laporan.html?id=${l.id}" class="btn btn-outline btn-small" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="detail-laporan.html?id=${l.id}" class="btn btn-info btn-small" title="Detail" target="_blank">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                                <div style="display: flex; gap: 5px;">
+                                    <a href="edit-laporan.html?id=${l.id}" class="btn btn-outline btn-small" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="detail-laporan.html?id=${l.id}" class="btn btn-info btn-small" title="Detail" target="_blank">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     `).join('');
@@ -432,7 +436,7 @@
                 const stats = data.success ? data.data
                     : await fetch('api.php?action=get_status_stats')
                         .then(r => r.json())
-                        .then(d => d.data?.stats || []);
+                        .then(d => d.stats || d.data || []);
 
                 const labels   = (data.success ? stats : stats).map(s => capitalizeFirst(s.status));
                 const values   = (data.success ? stats : stats).map(s => parseInt(s.total));
@@ -468,7 +472,7 @@
                 const raw    = data.success ? data.data
                     : await fetch('api.php?action=get_kerusakan_stats')
                         .then(r => r.json())
-                        .then(d => d.data?.stats || []);
+                        .then(d => d.stats || d.data || []);
                 const stats  = data.success ? raw : raw;
                 const labels = stats.map(s => capitalizeFirst(s.tingkat_kerusakan));
                 const values = stats.map(s => parseInt(s.total));
@@ -505,7 +509,7 @@
                 const raw   = data.success ? data.data
                     : await fetch('api.php?action=get_kecamatan_stats')
                         .then(r => r.json())
-                        .then(d => d.data?.stats || []);
+                        .then(d => d.stats || d.data || []);
                 const stats = (data.success ? raw : raw).slice(0, 10);
 
                 const labels   = stats.map(s => s.kecamatan);
@@ -546,7 +550,7 @@
                 const data = await res.json();
                 if (!data.success) return;
 
-                const stats   = data.data.stats;
+                const stats   = data.stats || data.data;
                 const top5    = stats.slice(0, 5);
                 const maxTotal = top5.length > 0 ? parseInt(top5[0].total) : 1;
 
