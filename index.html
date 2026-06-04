@@ -18,7 +18,7 @@
                     <span>PantauJalan<span class="logo-highlight">Surabaya</span></span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Beranda</a></li>
+                    <li><a href="#hero" class="active">Beranda</a></li>
                     <li><a href="#tentang">Tentang</a></li>
                     <li><a href="#cara-lapor">Cara Lapor</a></li>
                     <li><a href="#kontak">Kontak</a></li>
@@ -35,7 +35,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="hero">
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">Laporkan Jalan Rusak di Surabaya</h1>
@@ -490,6 +490,33 @@
                         top: targetElement.offsetTop - 80,
                         behavior: 'smooth'
                     });
+                }
+            });
+        });
+
+        // ScrollSpy to update active link in navbar
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id], footer[id]');
+            const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+            let current = 'hero';
+            const scrollPosition = window.scrollY + 120;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollPosition >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            // Force active state for last section (Kontak) if scrolled to the absolute bottom
+            if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 10) {
+                current = 'kontak';
+            }
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
                 }
             });
         });
