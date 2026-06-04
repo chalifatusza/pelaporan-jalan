@@ -140,7 +140,6 @@
                     break;
             }
 
-            let body = init ? init.body : null;
             if (body instanceof FormData) {
                 isFormData = true;
                 if (!id) {

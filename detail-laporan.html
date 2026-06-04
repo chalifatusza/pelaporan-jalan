@@ -7,6 +7,103 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                font-family: 'Poppins', Arial, sans-serif;
+                padding: 0;
+                margin: 0;
+            }
+            .dashboard-header, 
+            .no-print, 
+            .card-footer, 
+            .dashboard-content-header div:last-child {
+                display: none !important;
+            }
+            .dashboard-main {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .card-header {
+                background: none !important;
+                color: black !important;
+                border-bottom: 2px solid #333 !important;
+                padding: 0 0 10px 0 !important;
+                margin-bottom: 20px !important;
+            }
+            .card-header h2 {
+                color: black !important;
+                font-size: 1.5rem !important;
+            }
+            .print-header {
+                display: block !important;
+            }
+            .grid-row-2 {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 20px !important;
+            }
+            table td {
+                padding: 6px 0 !important;
+            }
+            img {
+                max-height: 250px !important;
+                page-break-inside: avoid;
+            }
+        }
+        
+        .print-header {
+            display: none;
+        }
+        .print-kop {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .print-kop h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #111;
+        }
+        .print-kop h3 {
+            margin: 3px 0 0 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .print-kop p {
+            margin: 5px 0 0 0;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .print-divider {
+            border-bottom: 3px double #000;
+            margin-bottom: 15px;
+        }
+        .print-doc-title {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-header">
@@ -93,12 +190,22 @@
             const isAdmin = laporan.role === 'admin';
             
             const html = `
+                <div class="print-header">
+                    <div class="print-kop">
+                        <h2>PEMERINTAH KOTA SURABAYA</h2>
+                        <h3>DINAS SUMBER DAYA AIR DAN BINA MARGA</h3>
+                        <p>Jl. Jimerto No. 25-27, Surabaya • Telp: (031) 5312144 • Email: dsdabm@surabaya.go.id</p>
+                    </div>
+                    <div class="print-divider"></div>
+                    <h3 class="print-doc-title">LAPORAN PENGADUAN KERUSAKAN JALAN</h3>
+                </div>
+
                 <div class="dashboard-content-header">
                     <div>
                         <h1 class="dashboard-title">Detail Laporan</h1>
                         <p>ID: #${laporan.id} • ${formatDate(laporan.tanggal_laporan_formatted)}</p>
                     </div>
-                    <div>
+                    <div class="no-print">
                         <a href="edit-laporan.html?id=${laporan.id}" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Edit Laporan
                         </a>
@@ -208,7 +315,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer no-print">
                         <div>
                             <button class="btn btn-outline" onclick="handleKembali()">
                                 <i class="fas fa-arrow-left"></i> Kembali
