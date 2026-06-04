@@ -119,12 +119,24 @@
                     path = `/stats/status?range=${rangeFilter}`;
                     method = 'GET';
                     break;
+                case 'get_status_stats':
+                    path = '/stats/status';
+                    method = 'GET';
+                    break;
                 case 'get_kerusakan_stats_filtered':
                     path = `/stats/kerusakan?range=${rangeFilter}`;
                     method = 'GET';
                     break;
+                case 'get_kerusakan_stats':
+                    path = '/stats/kerusakan';
+                    method = 'GET';
+                    break;
                 case 'get_kecamatan_stats_filtered':
                     path = `/stats/kecamatan?range=${rangeFilter}`;
+                    method = 'GET';
+                    break;
+                case 'get_kecamatan_stats':
+                    path = '/stats/kecamatan';
                     method = 'GET';
                     break;
                 case 'get_kategori':
