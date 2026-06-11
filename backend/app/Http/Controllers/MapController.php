@@ -19,6 +19,11 @@ class MapController extends Controller
             ->get();
 
         $formattedLaporans = $laporans->map(function ($laporan) {
+            $fotoPath = $laporan->foto_path;
+            if ($fotoPath && strlen($fotoPath) > 300000) {
+                $fotoPath = null;
+            }
+
             return [
                 'id' => $laporan->id,
                 'judul_laporan' => $laporan->judul_laporan,
@@ -28,7 +33,7 @@ class MapController extends Controller
                 'status' => $laporan->status,
                 'latitude' => $laporan->latitude,
                 'longitude' => $laporan->longitude,
-                'foto_path' => $laporan->foto_path,
+                'foto_path' => $fotoPath,
                 'tanggal' => $laporan->created_at->format('d F Y'),
                 'nama_lengkap' => $laporan->user->nama_lengkap ?? '',
             ];

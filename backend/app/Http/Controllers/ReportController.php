@@ -32,19 +32,30 @@ class ReportController extends Controller
             $query->where('kecamatan', $request->kecamatan);
         }
 
+        $columns = [
+            'id', 'user_id', 'kategori_id', 'judul_laporan', 'lokasi_jalan',
+            'kecamatan', 'deskripsi_kerusakan', 'tingkat_kerusakan', 'status',
+            'latitude', 'longitude', 'created_at', 'updated_at'
+        ];
+
         if ($user->role === 'admin') {
-            $reports = $query->orderBy('created_at', 'desc')->get();
+            $reports = $query->select($columns)->orderBy('created_at', 'desc')->get();
         } else {
             $reports = $query->where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
         }
 
         // Map and format for frontend compatibility
-        $formattedReports = $reports->map(function ($report) {
+        $formattedReports = $reports->map(function ($report) use ($user) {
             $arr = $report->toArray();
             $arr['nama_lengkap'] = $report->user->nama_lengkap ?? '';
             $arr['username'] = $report->user->username ?? '';
             $arr['nama_kategori'] = $report->kategori->nama_kategori ?? '';
             $arr['tanggal_laporan_formatted'] = $report->created_at->format('d F Y H:i');
+            
+            // Limit foto_path size in lists for normal users to avoid payload timeout
+            if ($user->role !== 'admin' && isset($arr['foto_path']) && strlen($arr['foto_path']) > 300000) {
+                $arr['foto_path'] = null;
+            }
             return $arr;
         });
 

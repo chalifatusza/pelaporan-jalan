@@ -277,19 +277,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const currentPageName = window.location.pathname.split('/').pop();
     
-    // Load appropriate data based on page
     switch(currentPageName) {
         case 'dashboard-admin.html':
             loadAdminDashboard();
             break;
         case 'dashboard-user.html':
             loadUserDashboard();
-            break;
-        case 'daftar-laporan-admin.html':
-            loadAllLaporanForAdmin();
-            break;
-        case 'daftar-laporan.html':
-            loadUserLaporan();
             break;
         case 'edit-laporan.html':
             loadEditLaporanForm();
@@ -298,9 +291,6 @@ document.addEventListener('DOMContentLoaded', function() {
         case 'edit-profil-admin.html':
         case 'edit-profil-user.html':
             loadProfileData();
-            break;
-        case 'kelola-pengguna.html':
-            loadAllUsers();
             break;
     }
     

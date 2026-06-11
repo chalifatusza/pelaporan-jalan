@@ -15,8 +15,15 @@ class LaporanController extends Controller
     {
         $user = $request->user();
 
+        $columns = [
+            'id', 'user_id', 'judul_laporan', 'lokasi_jalan', 'kecamatan',
+            'deskripsi_kerusakan', 'tingkat_kerusakan', 'status', 'latitude',
+            'longitude', 'created_at', 'updated_at'
+        ];
+
         if ($user->role === 'admin') {
             $laporans = Laporan::with('user:id,nama_lengkap,username,email')
+                ->select($columns)
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
@@ -27,11 +34,16 @@ class LaporanController extends Controller
         }
 
         // Map and format for frontend compatibility
-        $formattedLaporans = $laporans->map(function ($laporan) {
+        $formattedLaporans = $laporans->map(function ($laporan) use ($user) {
             $arr = $laporan->toArray();
             $arr['nama_lengkap'] = $laporan->user->nama_lengkap ?? '';
             $arr['username'] = $laporan->user->username ?? '';
             $arr['tanggal_laporan_formatted'] = $laporan->created_at->format('d F Y H:i');
+            
+            // Limit foto_path size in lists for normal users to avoid payload timeout
+            if ($user->role !== 'admin' && isset($arr['foto_path']) && strlen($arr['foto_path']) > 300000) {
+                $arr['foto_path'] = null;
+            }
             return $arr;
         });
 
